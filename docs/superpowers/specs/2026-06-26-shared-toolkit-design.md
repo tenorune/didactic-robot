@@ -110,6 +110,31 @@ the CLI's native per-project memory under `~/.claude/projects/.../memory/`.)
 4. **Verify** end-to-end: install in the CLI; run the same setup-script commands in a cloud
    environment and confirm the toolkit loads with no project-repo changes.
 
+## Open risk: private-repo auth in cloud environments (UNVERIFIED)
+
+The setup-script approach is **only verified for public sources** (the user's working
+examples — `obra/superpowers-marketplace`, `BehiSecc/VibeSec-Skill` — are public). Whether a
+Cloud environment Setup Script can install a marketplace/plugin from a **private** GitHub repo
+is **not yet confirmed**. This is the design's biggest assumption and must be resolved before
+relying on it.
+
+To investigate during planning/spike:
+- Does the cloud environment have git credentials (e.g. an injected `GITHUB_TOKEN`/`GH_TOKEN`,
+  or a connected GitHub account) that `claude plugin marketplace add` / `git clone` can use for
+  a private repo? Docs suggest auto-update auth uses `GITHUB_TOKEN`/`GH_TOKEN`, but manual
+  install during the setup script is unconfirmed.
+- If a token is needed, where is it set for the cloud environment, and can the setup script
+  `git clone https://<token>@github.com/<owner>/<repo>` or configure a credential helper?
+
+Fallback options if private auth is impractical:
+1. **Public repo, no secrets.** Keep the repo public but guarantee zero identifiers/secrets
+   (this design already forbids identifiers). Simplest if nothing sensitive ever lives here.
+2. **PAT in setup script / env.** Use a fine-grained read-only token in the cloud env.
+3. **SSH deploy key** configured in the cloud environment.
+
+A small spike (try installing from the private repo in a real cloud environment) should be the
+first implementation step, since the chosen path affects the README and setup-script contents.
+
 ## Out of scope (deferred)
 
 - **`/insights` session analysis.** Mining past sessions to improve workflows is a separate
@@ -127,3 +152,5 @@ the CLI's native per-project memory under `~/.claude/projects/.../memory/`.)
 - No personal identifiers appear anywhere in the repo or its history.
 - Using the toolkit in Web requires only the Cloud environment Setup Script — **no project repo
   ever references the toolkit, its repo, or its marketplace.**
+- The chosen private-vs-public + auth path actually installs the toolkit in a real cloud
+  environment (verified by spike, not assumed).
