@@ -3,9 +3,13 @@
 # This single script is the source of truth for everything you want available in EVERY
 # environment — your own toolkit plus curated skills authored by others.
 #
-# Use it in BOTH harnesses:
-#   - Cloud (Web): paste into the environment's "Setup script" field (or manage via /remote-env).
-#   - Local (CLI): run it once on a machine to install the same set.
+# Same script, both harnesses — only the invocation differs:
+#   - Cloud (Web): paste into the environment's "Setup script" field (or manage via /remote-env);
+#     the environment runs it automatically at session start.
+#   - Local (CLI): run it yourself once on a new machine. Prereqs: the `claude` CLI and a
+#     GitHub login with access to the private repo (`gh auth login`). Then:
+#         gh repo clone tenorune/didactic-robot
+#         bash didactic-robot/setup/setup-script.sh
 #
 # Private same-owner repos install with no extra token (cloud sessions have account-level
 # GitHub access). If a source ever lacks access, set GITHUB_TOKEN (PAT, repo scope) in the
