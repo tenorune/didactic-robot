@@ -25,26 +25,36 @@ with the Claude Code CLI and Claude Code on the Web — without duplicating the 
 Confirmed against current Claude Code docs (code.claude.com/docs — Claude Code on the web,
 Skills, Plugin marketplaces):
 
-- Web cloud sessions **do not** read personal `~/.claude/skills/`. They read only:
-  (a) project skills committed to the session repo's `.claude/skills/`, and
-  (b) plugin skills from a marketplace declared in the repo's `.claude/settings.json`.
 - A plugin marketplace **can be a private GitHub repo**. CLI installs use existing git
-  credentials (`gh auth`); Web auto-updates authenticate via a `GITHUB_TOKEN`/`GH_TOKEN`
-  env var set in the cloud session environment.
-- There is **no global "always load my personal skills"** for Web. The only repetition is a
-  small committed `.claude/settings.json` stanza per project repo — a dependency
-  *declaration*, not a copy of any skill.
+  credentials (`gh auth`).
+- **Consumption is driven entirely by the Cloud environment Setup Script** (configured once
+  per cloud environment), NOT by anything committed to project repos. The setup script runs
+  install/clone commands against the environment's `~/.claude`, and the running cloud session
+  reads that same home directory — so both `claude plugin install …` and `git clone … into
+  ~/.claude/skills/` work. The user has verified this approach in current Web environments.
+- **Project repos stay clean.** No project repo references this toolkit, its repo, or its
+  marketplace in any committed file. This is a hard requirement, not just a preference.
 
 ## Approach
 
 Make `didactic-robot` itself a **private Claude Code plugin marketplace** exposing a single
-plugin named **`toolkit`** that bundles the portable assets.
+plugin named **`toolkit`** that bundles the portable assets. Both harnesses consume it with
+the same commands; only *where* those commands run differs.
 
-- **CLI:** install once —
-  `/plugin marketplace add tenorune/didactic-robot` then `/plugin install toolkit`.
-- **Web:** in each project repo to use it in, commit a ~6-line `.claude/settings.json`
-  declaring this marketplace in `extraKnownMarketplaces` and enabling `toolkit@didactic-robot`;
-  set `GITHUB_TOKEN` in the cloud session env for the private pull.
+- **CLI (local):** run once —
+  `claude plugin marketplace add tenorune/didactic-robot` then
+  `claude plugin install toolkit@didactic-robot` (or the `/plugin` UI equivalent).
+- **Web (cloud):** put the same commands in the **Cloud environment Setup Script**, so every
+  session in that environment gets the toolkit. Nothing is added to any project repo. A
+  reference setup script lives in the repo (see `setup/setup-script.sh`). Example shape:
+
+  ```bash
+  #!/bin/bash
+  set -e
+  claude plugin marketplace add tenorune/didactic-robot
+  claude plugin install toolkit@didactic-robot
+  echo "Toolkit ready."
+  ```
 
 ## Repository layout
 
@@ -63,8 +73,8 @@ didactic-robot/
 ├── memories/                      # curated markdown fact-files (preferences, decisions, refs)
 │   └── MEMORY.md                  # index of the fact-files
 ├── instruction-blocks/           # reusable CLAUDE.md snippets (a library to paste / @import)
-├── templates/
-│   └── project-settings.json      # the stanza to drop into a consuming repo's .claude/
+├── setup/
+│   └── setup-script.sh            # reference Cloud-env Setup Script (install commands)
 ├── docs/
 │   └── superpowers/specs/         # this spec and future specs
 └── README.md                      # what this repo is + how to consume it (CLI + Web)
@@ -74,7 +84,7 @@ didactic-robot/
 
 | Asset | Lives in | CLI | Web | Notes |
 |-------|----------|:---:|:---:|-------|
-| Skills | `plugins/toolkit/skills/` | ✅ | ✅ | Namespaced `toolkit:<skill>`; auto-discovered once plugin installed/declared |
+| Skills | `plugins/toolkit/skills/` | ✅ | ✅ | Namespaced `toolkit:<skill>`; auto-discovered once the plugin is installed via the setup script |
 | Output styles | `plugins/toolkit/output-styles/` | ✅ | ✅ | Selected via `/output-style`; bundled in the plugin |
 | Instruction blocks | `instruction-blocks/` | ✅ | ✅ | Plain markdown library; pasted or `@import`ed into a CLAUDE.md. Not auto-loaded by design |
 | Memories | `memories/` + `shared-memory` skill | ✅ | ✅ | Files are inert; the `shared-memory` skill makes them discoverable and reads them on demand |
@@ -97,7 +107,8 @@ the CLI's native per-project memory under `~/.claude/projects/.../memory/`.)
    - Skills / prompts embedded in other project repos
 2. **Migrate** each into the structure above, scrubbing any personal identifiers during the move.
 3. **Wire up** the marketplace + plugin manifests so an install actually resolves.
-4. **Verify** end-to-end: install in the CLI; declare + load in a throwaway Web-style project repo.
+4. **Verify** end-to-end: install in the CLI; run the same setup-script commands in a cloud
+   environment and confirm the toolkit loads with no project-repo changes.
 
 ## Out of scope (deferred)
 
@@ -114,4 +125,5 @@ the CLI's native per-project memory under `~/.claude/projects/.../memory/`.)
 
 - A skill authored once in this repo is usable, unmodified, in both the CLI and a Web session.
 - No personal identifiers appear anywhere in the repo or its history.
-- Adding the toolkit to a new project for Web use requires only the small committed settings stanza — no skill copying.
+- Using the toolkit in Web requires only the Cloud environment Setup Script — **no project repo
+  ever references the toolkit, its repo, or its marketplace.**
