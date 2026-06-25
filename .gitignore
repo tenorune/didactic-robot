@@ -1,0 +1,2 @@
+# Machine-local Claude Code settings (permissions, etc.) — never commit
+.claude/settings.local.json

@@ -1,0 +1,20 @@
+{
+  "name": "didactic-robot",
+  "description": "Private, cross-harness store of project-agnostic skills, output styles, and shared memory.",
+  "owner": {
+    "name": "tenorune",
+    "email": "117549102+tenorune@users.noreply.github.com"
+  },
+  "plugins": [
+    {
+      "name": "toolkit",
+      "description": "Project-agnostic skills, output styles, and shared-memory access for use across Claude Code CLI and Web.",
+      "version": "0.0.1",
+      "source": "./plugins/toolkit",
+      "author": {
+        "name": "tenorune",
+        "email": "117549102+tenorune@users.noreply.github.com"
+      }
+    }
+  ]
+}
