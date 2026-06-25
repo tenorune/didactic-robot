@@ -110,21 +110,23 @@ the CLI's native per-project memory under `~/.claude/projects/.../memory/`.)
 4. **Verify** end-to-end: install in the CLI; run the same setup-script commands in a cloud
    environment and confirm the toolkit loads with no project-repo changes.
 
-## Open risk: private-repo auth in cloud environments
+## Private-repo auth: RESOLVED (spike complete, 2026-06-26)
 
-**Status (2026-06-26 spike):**
+The design's biggest assumption is confirmed on both harnesses.
+
 - **CLI from private repo — VERIFIED.** `claude plugin marketplace add tenorune/didactic-robot`
   clones the private repo over HTTPS via local `gh` credentials and validates;
-  `claude plugin install toolkit@didactic-robot` installs and enables it. Confirmed with a
-  minimal scaffold (the `toolkit` plugin + a `toolkit-smoke-test` skill).
-- **Cloud environment from private repo — PENDING user test.** Docs say cloud sessions have
-  account-level GitHub access (*"can access any repository the connecting GitHub account can
-  see"*), so the same-owner private marketplace is expected to install with no extra token;
-  `GITHUB_TOKEN` (PAT, `repo` scope) set in the environment is the documented fallback. Docs
-  explicitly flag this as needing an empirical test — the spike's remaining step.
+  `claude plugin install toolkit@didactic-robot` installs and enables it.
+- **Cloud environment from private repo — VERIFIED.** The Cloud environment Setup Script
+  (`claude plugin marketplace add` + `claude plugin install`) installed the private
+  same-owner marketplace and the `toolkit-smoke-test` skill loaded in the web session — with
+  **no token required**, consistent with the documented account-level GitHub access.
+- **Fallback (unused but documented):** if a future case lacks access, set `GITHUB_TOKEN`
+  (PAT, `repo` scope) in the environment, or use the tokenized-clone variant in
+  `setup/setup-script.sh`.
 
-Whether a Cloud environment Setup Script can install from a **private** GitHub repo is the
-design's biggest assumption; the cloud half must be confirmed before relying on it.
+Both spike artifacts (the minimal `toolkit` plugin and `toolkit-smoke-test` skill) remain in
+the repo and become the seed the real assets are migrated into.
 
 To investigate during planning/spike:
 - Does the cloud environment have git credentials (e.g. an injected `GITHUB_TOKEN`/`GH_TOKEN`,
