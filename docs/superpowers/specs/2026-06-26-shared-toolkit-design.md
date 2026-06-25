@@ -110,13 +110,21 @@ the CLI's native per-project memory under `~/.claude/projects/.../memory/`.)
 4. **Verify** end-to-end: install in the CLI; run the same setup-script commands in a cloud
    environment and confirm the toolkit loads with no project-repo changes.
 
-## Open risk: private-repo auth in cloud environments (UNVERIFIED)
+## Open risk: private-repo auth in cloud environments
 
-The setup-script approach is **only verified for public sources** (the user's working
-examples — `obra/superpowers-marketplace`, `BehiSecc/VibeSec-Skill` — are public). Whether a
-Cloud environment Setup Script can install a marketplace/plugin from a **private** GitHub repo
-is **not yet confirmed**. This is the design's biggest assumption and must be resolved before
-relying on it.
+**Status (2026-06-26 spike):**
+- **CLI from private repo — VERIFIED.** `claude plugin marketplace add tenorune/didactic-robot`
+  clones the private repo over HTTPS via local `gh` credentials and validates;
+  `claude plugin install toolkit@didactic-robot` installs and enables it. Confirmed with a
+  minimal scaffold (the `toolkit` plugin + a `toolkit-smoke-test` skill).
+- **Cloud environment from private repo — PENDING user test.** Docs say cloud sessions have
+  account-level GitHub access (*"can access any repository the connecting GitHub account can
+  see"*), so the same-owner private marketplace is expected to install with no extra token;
+  `GITHUB_TOKEN` (PAT, `repo` scope) set in the environment is the documented fallback. Docs
+  explicitly flag this as needing an empirical test — the spike's remaining step.
+
+Whether a Cloud environment Setup Script can install from a **private** GitHub repo is the
+design's biggest assumption; the cloud half must be confirmed before relying on it.
 
 To investigate during planning/spike:
 - Does the cloud environment have git credentials (e.g. an injected `GITHUB_TOKEN`/`GH_TOKEN`,
