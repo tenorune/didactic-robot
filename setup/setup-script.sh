@@ -1,25 +1,47 @@
 #!/bin/bash
-# Cloud environment Setup Script for Claude Code on the Web.
-# Paste this into the environment's "Setup script" field (or manage via /remote-env).
-# Goal of this spike: confirm a PRIVATE same-owner marketplace installs in a cloud env.
+# Canonical "load everywhere" manifest for Claude Code.
+# This single script is the source of truth for everything you want available in EVERY
+# environment — your own toolkit plus curated skills authored by others.
+#
+# Use it in BOTH harnesses:
+#   - Cloud (Web): paste into the environment's "Setup script" field (or manage via /remote-env).
+#   - Local (CLI): run it once on a machine to install the same set.
+#
+# Private same-owner repos install with no extra token (cloud sessions have account-level
+# GitHub access). If a source ever lacks access, set GITHUB_TOKEN (PAT, repo scope) in the
+# environment, or use a tokenized clone URL — see the fallback note at the bottom.
 set -e
 
-OWNER_REPO="tenorune/didactic-robot"   # private marketplace repo (same GitHub account)
-MARKETPLACE="didactic-robot"           # = "name" in .claude-plugin/marketplace.json
-PLUGIN="toolkit"
+# add_marketplace <owner/repo> : tolerant of already-added marketplaces on re-run.
+add_marketplace() { claude plugin marketplace add "$1" 2>/dev/null || true; }
 
-# Attempt 1 (expected to work): cloud sessions have account-level GitHub access, so the
-# marketplace add should authenticate via the environment's existing GitHub credentials.
-claude plugin marketplace add "$OWNER_REPO"
-claude plugin install "${PLUGIN}@${MARKETPLACE}"
+# ---------------------------------------------------------------------------------------
+# 1. Your own toolkit (private marketplace -> toolkit plugin)
+# ---------------------------------------------------------------------------------------
+add_marketplace "tenorune/didactic-robot"
+claude plugin install "toolkit@didactic-robot"
 
-echo "Toolkit ready: installed ${PLUGIN}@${MARKETPLACE} from ${OWNER_REPO}."
+# ---------------------------------------------------------------------------------------
+# 2. Curated skills created by others, loaded everywhere.
+#    Two ways to reference an external skill from upstream:
+#      (a) marketplace plugin  -> add_marketplace + claude plugin install
+#      (b) loose skill repo     -> git clone into ~/.claude/skills/<name>
+#    Keep this list curated; add/remove entries as your "load everywhere" set evolves.
+# ---------------------------------------------------------------------------------------
 
-# --- Fallback (only if Attempt 1 fails with an auth/clone error) -------------------------
-# Set GITHUB_TOKEN (a PAT with `repo` scope) in the environment settings, then either:
-#   1) rely on GITHUB_TOKEN being honored by `claude plugin marketplace add` (re-run above), or
-#   2) clone the marketplace explicitly with a tokenized URL, e.g.:
-#        git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${OWNER_REPO}.git" \
-#          "$HOME/didactic-robot"
-#        claude plugin marketplace add "$HOME/didactic-robot"
-#        claude plugin install "${PLUGIN}@${MARKETPLACE}"
+# (a) superpowers core skills library
+add_marketplace "obra/superpowers-marketplace"
+claude plugin install "superpowers@superpowers-marketplace"
+
+# (b) VibeSec — security-review skill distributed as a loose repo
+if [ ! -d "$HOME/.claude/skills/VibeSec-Skill" ]; then
+  git clone https://github.com/BehiSecc/VibeSec-Skill "$HOME/.claude/skills/VibeSec-Skill"
+fi
+
+echo "Load-everywhere set ready: toolkit + curated external skills installed."
+
+# --- Fallback for a PRIVATE external source that needs auth -----------------------------
+# Set GITHUB_TOKEN (PAT with read access) in the environment, then either re-run the add
+# (GITHUB_TOKEN/GH_TOKEN is honored), or clone explicitly:
+#   git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/<owner>/<repo>.git" \
+#     "$HOME/.claude/skills/<name>"

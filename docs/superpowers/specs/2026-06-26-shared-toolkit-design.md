@@ -74,7 +74,7 @@ didactic-robot/
 │   └── MEMORY.md                  # index of the fact-files
 ├── instruction-blocks/           # reusable CLAUDE.md snippets (a library to paste / @import)
 ├── setup/
-│   └── setup-script.sh            # reference Cloud-env Setup Script (install commands)
+│   └── setup-script.sh            # canonical "load everywhere" manifest: toolkit + curated externals
 ├── docs/
 │   └── superpowers/specs/         # this spec and future specs
 └── README.md                      # what this repo is + how to consume it (CLI + Web)
@@ -88,6 +88,23 @@ didactic-robot/
 | Output styles | `plugins/toolkit/output-styles/` | ✅ | ✅ | Selected via `/output-style`; bundled in the plugin |
 | Instruction blocks | `instruction-blocks/` | ✅ | ✅ | Plain markdown library; pasted or `@import`ed into a CLAUDE.md. Not auto-loaded by design |
 | Memories | `memories/` + `shared-memory` skill | ✅ | ✅ | Files are inert; the `shared-memory` skill makes them discoverable and reads them on demand |
+| External skills (others') | referenced in `setup/setup-script.sh` | ✅ | ✅ | NOT copied. The setup script installs them from upstream (marketplace plugin, or `git clone` into `~/.claude/skills/`) so they update at the source and keep attribution |
+
+### External skills — "load everywhere" via the setup script
+
+Key skills authored by others that should be present in every environment are **referenced
+from upstream, not vendored.** `setup/setup-script.sh` is the single canonical manifest of
+what loads everywhere: it installs the `toolkit` plugin and then each curated external source.
+Two reference styles are supported per entry:
+
+- **Marketplace plugin:** `claude plugin marketplace add <owner>/<repo>` + `claude plugin install <plugin>@<marketplace>`.
+- **Loose skill repo:** `git clone <repo> ~/.claude/skills/<name>`.
+
+Because the same script runs in the CLI and in cloud environments, a skill added to the list
+appears everywhere with one edit. Rationale for referencing over copying: upstream updates flow
+through automatically and original authorship/licensing stays intact. Initial curated set
+(carried over from the user's existing setup): `obra/superpowers-marketplace` (plugin) and
+`BehiSecc/VibeSec-Skill` (loose repo).
 
 ### The `shared-memory` skill
 
@@ -105,6 +122,7 @@ the CLI's native per-project memory under `~/.claude/projects/.../memory/`.)
    - Existing output styles
    - Global CLAUDE.md rules → candidates for `instruction-blocks/`
    - Skills / prompts embedded in other project repos
+   - The curated set of external (others') skills to load everywhere → entries in `setup/setup-script.sh`
 2. **Migrate** each into the structure above, scrubbing any personal identifiers during the move.
 3. **Wire up** the marketplace + plugin manifests so an install actually resolves.
 4. **Verify** end-to-end: install in the CLI; run the same setup-script commands in a cloud
