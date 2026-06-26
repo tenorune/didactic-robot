@@ -19,7 +19,7 @@
 
 Reusable verification snippets (referenced by tasks):
 - **FRONTMATTER(file):** `awk '/^---/{c++;next} c==1' <file> | grep -E '^(name|description):'` → expect both lines.
-- **SCAN(path):** `grep -rniE '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|ghp_[A-Za-z0-9]|gho_[A-Za-z0-9]|github_pat_' <path> | grep -vF '117549102+tenorune@users.noreply.github.com'` → expect empty. Detects any email/secret generically and filters out the single allowed noreply address. **Hardcodes no personal identifier** (denylisting the real email would itself embed it — forbidden).
+- **SCAN(path):** `grep -rniE '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|ghp_[A-Za-z0-9]|gho_[A-Za-z0-9]|github_pat_[A-Za-z0-9_]' <path> | grep -vF '117549102+tenorune@users.noreply.github.com'` → expect empty. Detects any email/secret generically and filters out the single allowed noreply address. **Hardcodes no personal identifier** (denylisting the real email would itself embed it — forbidden). The token alternatives carry trailing char-classes so the pattern doesn't match its own documentation (a bare `github_pat_` would self-match wherever the scan is written down).
 - **LINT:** `jq empty .claude-plugin/marketplace.json plugins/toolkit/.claude-plugin/plugin.json` → exit 0.
 
 ---

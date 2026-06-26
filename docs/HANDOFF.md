@@ -47,7 +47,7 @@ This is a docs/config repo — no test suite. "Verification" =:
 jq empty .claude-plugin/marketplace.json plugins/toolkit/.claude-plugin/plugin.json
 bash -n setup/setup-script.sh
 # identifier/secret scan — generic detector, filters in only the allowed noreply address (names no identifier):
-grep -rniE '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|ghp_[A-Za-z0-9]|gho_[A-Za-z0-9]' . --exclude-dir=.git | grep -vF '117549102+tenorune@users.noreply.github.com'   # expect empty
+grep -rniE '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|ghp_[A-Za-z0-9]|gho_[A-Za-z0-9]|github_pat_[A-Za-z0-9_]' . --exclude-dir=.git | grep -vF '117549102+tenorune@users.noreply.github.com'   # expect empty
 ```
 Install locally (CLI): `claude plugin marketplace add tenorune/didactic-robot && claude plugin install toolkit@didactic-robot` (or run `setup/setup-script.sh`). Needs `gh auth` access to the private repo.
 Web: out of scope — the cloud Setup Script 403s every clone (see Landmines). Don't paste the setup
