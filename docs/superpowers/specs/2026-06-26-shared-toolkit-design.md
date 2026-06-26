@@ -1,7 +1,10 @@
 # Design: `didactic-robot` — a private, cross-harness store for skills, prompts, and memory
 
 **Date:** 2026-06-26
-**Status:** Approved (design); implementation plan to follow
+**Status:** Approved (design). Web-install decision **RESOLVED 2026-06-26 → CLI-ONLY; repo stays
+PRIVATE; Claude Code on the Web is out of scope** (the cloud Setup Script phase 403s every clone —
+verified; see below). A brief public-repo experiment was tried and reverted. Implementation plan
+to follow, scoped to the CLI.
 
 ## Problem
 
@@ -44,10 +47,12 @@ the same commands; only *where* those commands run differs.
 - **CLI (local):** run once —
   `claude plugin marketplace add tenorune/didactic-robot` then
   `claude plugin install toolkit@didactic-robot` (or the `/plugin` UI equivalent).
-- **Web (cloud):** NOT settled while the repo is private — see "Cloud (Web) install: findings +
-  OPEN DECISION" below. A private repo cannot be auto-loaded in Web without per-repo committed
-  files; making the repo public makes the Setup Script path work cleanly. This is the open
-  decision blocking the Web story.
+- **Web (cloud):** OUT OF SCOPE (2026-06-26). Empirically, the cloud Setup Script phase 403s
+  **every** clone — own/other-owner, public/private, raw `git clone` and `claude plugin
+  marketplace add` alike — so there is no working Setup-Script install path, and the in-session
+  alternatives all require either a forbidden committed project hook or per-session manual steps.
+  Decision: don't pursue Web for now; keep the repo private and use the toolkit via the CLI. See
+  "Cloud (Web) install: findings + DECISION" below.
 
 ## Repository layout
 
@@ -121,7 +126,28 @@ the CLI's native per-project memory under `~/.claude/projects/.../memory/`.)
 4. **Verify** end-to-end: install in the CLI; run the same setup-script commands in a cloud
    environment and confirm the toolkit loads with no project-repo changes.
 
-## Cloud (Web) install: findings + OPEN DECISION (2026-06-26)
+## Cloud (Web) install: findings + DECISION (2026-06-26)
+
+**DECISION (2026-06-26, revised): CLI-ONLY; keep the repo PRIVATE; Web is out of scope.**
+Originally resolved as "make the repo public + Setup Script install," and the repo was briefly
+made public. Then a four-command cloud probe **falsified the premise**: in the Setup Script phase
+(root, pre-session, no credential) the proxy 403s *every* clone — `claude plugin marketplace add
+obra/superpowers-marketplace` → 403, `git clone BehiSecc/VibeSec-Skill` → 403, `claude plugin
+marketplace add tenorune/didactic-robot` → 403 — regardless of visibility, and `claude plugin
+marketplace add` is just git-clone-through-the-proxy (superpowers has no releases, so no
+api.github.com bypass). Public bought nothing for the Setup Script path, and it also showed the
+old "superpowers/VibeSec load via the Setup Script" belief was never true in a project-connected
+environment. Rather than adopt an in-session hack (forbidden committed hook, or manual per-session
+install), the call is to **stop pursuing Web for now and focus on the CLI**; the repo was reverted
+to private. The [[no-personal-identifiers]] rule still holds (it keeps a future re-publish safe),
+and a pre-publish scan of the working tree + full history had confirmed zero identifiers/secrets.
+
+**Official org path (noted, not used):** Anthropic's "manage plugins for your organization"
+(support.claude.com/articles/13837433) distributes a marketplace from a repo that must be
+**private/internal** (public is disallowed for *org* marketplaces), authenticated via the Claude
+GitHub App installation token, on **Team/Enterprise plans** via Cowork. It does NOT cover Claude
+Code on the Web or setup scripts. It is the only sanctioned private route and is irrelevant to an
+individual plan — recorded here so a future Team/Enterprise migration can reconsider.
 
 A long spike mapped exactly how Claude Code on the Web reaches GitHub. Conclusions:
 
@@ -131,29 +157,32 @@ A long spike mapped exactly how Claude Code on the Web reaches GitHub. Conclusio
 - **Web cloud — the private repo CANNOT be auto-loaded without per-repo committed files.**
   The harness exposes three places to act, each with a hard limit for a *private* repo:
   - **Setup Script (env-level, pollution-free):** runs as `root` *before* the session, has **no
-    `GH_TOKEN`**, and its git goes through a per-session proxy scoped to the *connected* repo —
-    so cloning a different private repo 403s. (A *public* repo clones fine here.) Anything it
-    writes to `~/.claude` is wiped by the harness re-init that runs afterward.
+    `GH_TOKEN`**, and its git goes through a per-session proxy that **403s every non-connected
+    clone — public OR private, `git clone` or `claude plugin marketplace add`** (verified
+    2026-06-26; an earlier "a public repo clones fine here" note was WRONG). Anything it writes to
+    `~/.claude` is wiped by the harness re-init that runs afterward.
   - **`/session-start-hook` (project hook):** the built-in command writes a **committed**
     `<repo>/.claude/hooks/session-start.sh`. Runs in-session (has `GH_TOKEN`, can install the
     private toolkit via REST tarball) — but it's a committed file in every repo, which the
     no-identifiers / no-toolkit-refs rule forbids.
   - **User-level `~/.claude/settings.json` hook:** not honored (harness manages `~/.claude`).
-- A *public* repo sidesteps all of this: the Setup Script installs it before the skill registry
-  builds → native skills, no token, no hooks, no project files.
+- A *public* repo does NOT sidestep this (verified 2026-06-26): the Setup Script 403s it too, so
+  there is no clean Setup-Script install — public or private.
 
 Useful facts discovered: web sessions set `CLAUDE_CODE_REMOTE=true` and `CLAUDE_PROJECT_DIR`;
 the REST API (`api.github.com/.../tarball`, `Authorization: Bearer $GH_TOKEN`) bypasses the git
 proxy and works **in-session**; the git proxy rewrites `https://github.com/` →
 `http://local_proxy@127.0.0.1:PORT/git/` (see `~/.claude` memories for the full log).
 
-**OPEN DECISION (blocks finalizing the Web story):** pick one —
-1. **Make the repo PUBLIC** + Setup Script install. *Recommended.* Clean, deterministic, native
-   skills, no token/hooks/project-files. The no-identifiers rule exists to make this safe.
+**DECISION — chosen: option 4 (private, CLI-only); Web deferred.** The alternatives, for the record:
+1. **Make the repo PUBLIC** + Setup Script install. ❌ **Tried and reverted** — the cloud Setup
+   Script 403s every clone regardless of visibility, so public delivered no Web install. (The
+   no-identifiers rule still makes a future re-publish safe if the cloud behavior ever changes.)
 2. **Private + Setup-Script-injected *uncommitted* project hook** (`<repo>/.claude/hooks/…`,
    gitignored). Keeps it private; fragile (timing/persistence) and leaves untracked files.
 3. **Private + manual in-session install** each session (REST tarball).
-4. **Private, CLI-only** — auto-loads locally; install on demand in Web.
+4. **Private, CLI-only** — auto-loads locally; install on demand in Web. ✅ **CHOSEN** (Web
+   deferred until cloud proxy behavior changes or a non-hack path appears).
 
 The spike artifacts (`toolkit` plugin + `toolkit-smoke-test` skill) remain as the seed.
 
@@ -174,5 +203,6 @@ The spike artifacts (`toolkit` plugin + `toolkit-smoke-test` skill) remain as th
 - No personal identifiers appear anywhere in the repo or its history.
 - **No project repo ever references the toolkit, its repo, or its marketplace in a committed
   file.** (Hard rule; constrains the Web install path — see the OPEN DECISION.)
-- Using the toolkit in Web works via the chosen install path (pending the open public-vs-private
-  decision), verified in a real cloud environment.
+- Using the toolkit in the **CLI** works via `claude plugin marketplace add` + install (the
+  decided scope, 2026-06-26). Web is explicitly deferred — no working pollution-free path exists
+  given current cloud-proxy behavior.
