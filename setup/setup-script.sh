@@ -1,43 +1,37 @@
 #!/bin/bash
-# LOCAL (CLI) installer for the toolkit + curated external skills. Run once on a new machine
-# (needs the `claude` CLI + `gh auth login` with access to the private repo):
-#     gh repo clone tenorune/didactic-robot
-#     bash didactic-robot/setup/setup-script.sh
+# Loads the toolkit + curated external skills. Works in BOTH the Claude Code CLI and Claude Code
+# on the Web (same commands).
 #
-# SCOPE — CLI ONLY (repo is PRIVATE). Claude Code on the WEB is intentionally out of scope:
-# verified 2026-06-26 that the cloud Setup Script phase 403s EVERY clone (own/other, public/
-# private, git clone and `claude plugin marketplace add`), so no Setup-Script install works there.
-# Rationale: docs/superpowers/specs/2026-06-26-shared-toolkit-design.md ("Cloud (Web) install").
+# CLI: run once on a new machine —  bash didactic-robot/setup/setup-script.sh  (or paste the
+#      commands). The toolkit repo is PUBLIC, so no auth is required.
 #
-# Design rule: the CORE toolkit MUST succeed. Curated EXTERNAL skills are best-effort — a
-# renamed/unreachable upstream must never abort setup.
+# WEB: paste this body into the environment's Setup Script field. Conditions (verified 2026-06-26,
+#      reproduced on 2 repos):
+#        - the toolkit repo must be PUBLIC (no GH_TOKEN at build time to auth a private clone)
+#        - the Claude GitHub App must be set to "All repositories" (else the external clones 403)
+#        - run this TWICE on a repo: the FIRST run fails, an identical SECOND run succeeds
+#          (mechanism unexplained; an in-script retry was TESTED and does NOT help — a fresh session
+#          is required, not just elapsed time). A nonzero exit on run 1 is expected.
+#      Full findings: docs/superpowers/specs/2026-06-26-shared-toolkit-design.md ("Cloud (Web)
+#      install") + the cloud-git-proxy-blocks-other-owner-repos memory.
+#
+# This is the PROVEN script (each component installed independently; `exit $fail`). Keep it in sync
+# with what is actually verified on Web — do not silently "improve" it without re-verifying.
+fail=0
 
-# ---------------------------------------------------------------------------------------
-# 1. Core: your own toolkit (private marketplace -> toolkit plugin). Must succeed.
-# ---------------------------------------------------------------------------------------
-set -e
-claude plugin marketplace add tenorune/didactic-robot
-claude plugin install toolkit@didactic-robot
-echo "core: toolkit@didactic-robot installed."
-set +e   # below: external failures must NOT abort setup or fail the session
+# Toolkit (own public repo: tenorune/didactic-robot)
+claude plugin marketplace add tenorune/didactic-robot \
+  && claude plugin install toolkit@didactic-robot \
+  && echo "TOOLKIT=OK" || { echo "TOOLKIT=FAIL"; fail=1; }
 
-# ---------------------------------------------------------------------------------------
-# 2. Curated skills created by others (best-effort).
-# ---------------------------------------------------------------------------------------
-if claude plugin marketplace add obra/superpowers-marketplace \
-   && claude plugin install superpowers@superpowers-marketplace; then
-  echo "external: superpowers@superpowers-marketplace installed"
-else
-  echo "WARNING: skipped superpowers (public repo — likely a transient upstream/network issue) — continuing"
-fi
+# Superpowers (external marketplace)
+claude plugin marketplace add obra/superpowers-marketplace \
+  && claude plugin install superpowers@superpowers-marketplace \
+  && echo "SUPERPOWERS=OK" || { echo "SUPERPOWERS=FAIL"; fail=1; }
 
-if [ -d "$HOME/.claude/skills/VibeSec-Skill" ]; then
-  echo "external: VibeSec-Skill already present"
-elif git clone https://github.com/BehiSecc/VibeSec-Skill "$HOME/.claude/skills/VibeSec-Skill"; then
-  echo "external: VibeSec-Skill cloned"
-else
-  echo "WARNING: skipped VibeSec-Skill (public repo — likely a transient upstream/network issue) — continuing"
-fi
+# VibeSec (external skill, raw clone into ~/.claude/skills)
+git clone https://github.com/BehiSecc/VibeSec-Skill ~/.claude/skills/VibeSec-Skill \
+  && echo "VIBESEC=OK" || { echo "VIBESEC=FAIL"; fail=1; }
 
-echo "Done: core toolkit installed; externals best-effort."
-exit 0
+echo "=== setup done (fail=$fail) ==="
+exit $fail

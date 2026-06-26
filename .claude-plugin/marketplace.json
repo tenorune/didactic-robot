@@ -1,6 +1,6 @@
 {
   "name": "didactic-robot",
-  "description": "Private, CLI-focused store of project-agnostic skills, instruction-blocks, and shared memory.",
+  "description": "Store of project-agnostic skills, instruction-blocks, and shared memory for the Claude Code CLI and Web.",
   "owner": {
     "name": "tenorune",
     "email": "117549102+tenorune@users.noreply.github.com"
@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "toolkit",
-      "description": "Project-agnostic skills, instruction-blocks, and shared-memory access for the Claude Code CLI.",
+      "description": "Project-agnostic skills, instruction-blocks, and shared-memory access for the Claude Code CLI and Web.",
       "version": "0.1.0",
       "source": "./plugins/toolkit",
       "author": {

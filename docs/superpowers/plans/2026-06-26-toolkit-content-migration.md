@@ -14,7 +14,9 @@
 - **Commit identity:** `tenorune <117549102+tenorune@users.noreply.github.com>`.
 - **Commits/push are user-gated:** per repo convention, the implementer does NOT auto-commit or push. Each task ends at a verified, stageable checkpoint; the user triggers the commit batch. (This overrides the writing-plans default of committing every task.)
 - **No skill duplication.** Each asset authored exactly once.
-- **Web is out of scope.** Manifest copy must not claim Web support.
+- ~~**Web is out of scope.** Manifest copy must not claim Web support.~~ **SUPERSEDED 2026-06-26:**
+  Web works (public repo + Claude GitHub App "All repositories" + run setup script twice). Manifest
+  copy now states CLI **and** Web. See the spec's "Cloud (Web) install" section.
 - **Repo has no test suite.** "Verification" = `jq empty` on JSON, YAML-frontmatter presence check, identifier scan (expect empty), and `claude plugin` reinstall + dispatch.
 
 Reusable verification snippets (referenced by tasks):
@@ -280,7 +282,7 @@ Expected: empty. (No file-specific excludes needed — the scan names no identif
 
 - **Output styles:** none exist in `~/.claude/` to migrate; the `output-styles/` asset type stays empty (YAGNI — no empty dir created) until a real style exists.
 - **`shared-memory` path resolution:** Task 4 relies on `${CLAUDE_PLUGIN_ROOT}` with a glob fallback. If execution shows the var is not available to skills, the fallback glob is the supported path; confirm during Task 5 by asking a session to run `toolkit:shared-memory` and read the index.
-- **Web:** intentionally excluded (cloud Setup Script 403s every clone — see spec). Manifest copy updated to CLI-only in Task 5.
+- **Web:** ~~intentionally excluded (cloud Setup Script 403s every clone — see spec). Manifest copy updated to CLI-only in Task 5.~~ **CORRECTED 2026-06-26:** the "403s every clone" finding was a confound (GitHub App repo-scope + first-run failure). Web works with the repo PUBLIC + App "All repositories" + running the setup script twice; manifest copy updated to "CLI and Web". See the spec's "Cloud (Web) install" section.
 
 ## Self-Review
 

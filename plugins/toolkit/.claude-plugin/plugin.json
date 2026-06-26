@@ -1,6 +1,6 @@
 {
   "name": "toolkit",
-  "description": "Project-agnostic skills, instruction-blocks, and shared-memory access for the Claude Code CLI.",
+  "description": "Project-agnostic skills, instruction-blocks, and shared-memory access for the Claude Code CLI and Web.",
   "version": "0.1.0",
   "author": {
     "name": "tenorune",
@@ -13,6 +13,7 @@
     "skills",
     "instruction-blocks",
     "memory",
-    "cli"
+    "cli",
+    "web"
   ]
 }
