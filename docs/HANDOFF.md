@@ -27,22 +27,19 @@ docs/HANDOFF.md                      # this handoff
 
 ## What's next
 
-**Nothing is in flight.** Toolkit **v0.1.0 is built, verified, and pushed** (`main` @ latest):
-`handing-off-a-session` + `shared-memory` + `toolkit-smoke-test` skills, `instruction-blocks/`,
-in-plugin `memories/`, and the pre-commit guard. Verified end-to-end: auto-loads on any project
-(offline, repo-private), new skills dispatch, `${CLAUDE_PLUGIN_ROOT}/memories/` resolves.
+**Nothing is in flight.** Toolkit **v0.1.0** works in both the **CLI** and **Claude Code on the
+Web** — the Web path was verified (reproduced on 2 repos) and shipped 2026-06-26 (`main` @
+`518a60e`). Shipped work lives in git + the spec/plans; this section is forward-only.
 
-Likely next steps when you return (all optional/incremental):
+Next steps when you return (all optional/incremental):
 1. **Add assets as they arise:** more skills into `plugins/toolkit/skills/`; the first real
    **output style** into a new `plugins/toolkit/output-styles/` (none exist yet); more `memories/`
    fact-files (keep `MEMORY.md` index in sync). Bump `version` in both manifests on changes, then
    `claude plugin marketplace update didactic-robot` + uninstall/reinstall to refresh the cache.
-2. **Web now works** (2026-06-26, reproduced on 2 repos) with three conditions: (a) toolkit repo
-   **PUBLIC** (no `GH_TOKEN` at build time for private); (b) the **Claude GitHub App set to "All
-   repositories"** (else external clones 403); (c) run the Web Setup Script **twice** on a repo —
-   first run fails, identical second run succeeds (effect accepted; mechanism unexplained). Paste
-   `setup/setup-script.sh`'s body into the env's Setup Script field. Details in Landmines + the
-   `cloud-git-proxy-blocks-other-owner-repos` memory.
+2. **Web run-twice (optional):** the Web Setup Script must be run twice per repo (first run fails,
+   second succeeds); mechanism unexplained, and an in-script retry was already ruled out. Only worth
+   probing further if it becomes annoying — see the `cloud-git-proxy-blocks-other-owner-repos`
+   memory for what's been tried.
 3. **`/insights`** session-analysis is deferred (spec "Out of scope").
 
 ## On-ramp / source of truth
