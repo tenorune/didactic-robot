@@ -1,0 +1,33 @@
+#!/bin/bash
+# Pre-commit guard: block staged changes that introduce a personal identifier or secret.
+#
+# Scans only the ADDED lines in the staged diff for any email address or GitHub token,
+# then filters out the single allowed identity (the noreply commit address). Anything left
+# is a leak — the commit is rejected. This names no personal identifier itself; it detects
+# generically (see memory: identifier-scan-generic-not-denylist).
+#
+# Enable once per clone:  git config core.hooksPath .githooks   (the setup script does this).
+# Intentional override:   git commit --no-verify
+set -u
+
+ALLOWED='117549102+tenorune@users.noreply.github.com'
+PATTERN='[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|ghp_[A-Za-z0-9]|gho_[A-Za-z0-9]|github_pat_[A-Za-z0-9_]'
+
+# Added lines only (new content being introduced), minus the diff's own +++ header lines.
+hits=$(git diff --cached --no-color -U0 \
+  | grep -E '^\+' | grep -vE '^\+\+\+' \
+  | grep -niE "$PATTERN" \
+  | grep -vF "$ALLOWED" || true)
+
+if [ -n "$hits" ]; then
+  {
+    echo "pre-commit BLOCKED: staged changes contain an email/secret that is not the allowed noreply identity."
+    echo "Offending added lines:"
+    echo "$hits"
+    echo
+    echo "Fix: remove the identifier/secret (or use the allowed noreply address)."
+    echo "Override (only if you are certain it is safe): git commit --no-verify"
+  } >&2
+  exit 1
+fi
+exit 0

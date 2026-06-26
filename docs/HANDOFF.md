@@ -52,6 +52,9 @@ grep -rniE '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|ghp_[A-Za-z0-9]|gho_[A-Za-z0-9
 Install locally (CLI): `claude plugin marketplace add tenorune/didactic-robot && claude plugin install toolkit@didactic-robot` (or run `setup/setup-script.sh`). Needs `gh auth` access to the private repo.
 Web: out of scope — the cloud Setup Script 403s every clone (see Landmines). Don't paste the setup
 script into a Web Setup Script field expecting it to work.
+Pre-commit guard: `.githooks/pre-commit` blocks any staged email/secret except the allowed
+noreply address (generic detector — names no identifier). Enable once per clone:
+`git config core.hooksPath .githooks`. Override a false positive with `git commit --no-verify`.
 Verify a session: ask Claude to **run the `toolkit-smoke-test` skill**.
 Auto-load (VERIFIED 2026-06-26 by spike): once installed at user scope + enabled in
 `~/.claude/settings.json`, the toolkit loads in **any** project dir, offline from the local
