@@ -31,7 +31,7 @@ This is a docs/config repo — no test suite. "Verification" =:
 ```bash
 jq empty .claude-plugin/marketplace.json plugins/toolkit/.claude-plugin/plugin.json
 bash -n setup/setup-script.sh
-grep -rniE '***REDACTED-ID-PATTERN***|ghp_|gho_' . --exclude-dir=.git   # must be empty (no identifiers)
+grep -rniE '***REDACTED-ID-PATTERN***|ghp_|gho_' . --exclude-dir=.git --exclude=HANDOFF.md   # expect empty
 ```
 Install locally: `claude plugin marketplace add tenorune/didactic-robot && claude plugin install toolkit@didactic-robot`.
 Verify a session: ask Claude to **run the `toolkit-smoke-test` skill**.
