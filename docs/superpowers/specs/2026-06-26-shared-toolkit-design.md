@@ -44,17 +44,10 @@ the same commands; only *where* those commands run differs.
 - **CLI (local):** run once —
   `claude plugin marketplace add tenorune/didactic-robot` then
   `claude plugin install toolkit@didactic-robot` (or the `/plugin` UI equivalent).
-- **Web (cloud):** put the same commands in the **Cloud environment Setup Script**, so every
-  session in that environment gets the toolkit. Nothing is added to any project repo. A
-  reference setup script lives in the repo (see `setup/setup-script.sh`). Example shape:
-
-  ```bash
-  #!/bin/bash
-  set -e
-  claude plugin marketplace add tenorune/didactic-robot
-  claude plugin install toolkit@didactic-robot
-  echo "Toolkit ready."
-  ```
+- **Web (cloud):** NOT settled while the repo is private — see "Cloud (Web) install: findings +
+  OPEN DECISION" below. A private repo cannot be auto-loaded in Web without per-repo committed
+  files; making the repo public makes the Setup Script path work cleanly. This is the open
+  decision blocking the Web story.
 
 ## Repository layout
 
@@ -128,40 +121,41 @@ the CLI's native per-project memory under `~/.claude/projects/.../memory/`.)
 4. **Verify** end-to-end: install in the CLI; run the same setup-script commands in a cloud
    environment and confirm the toolkit loads with no project-repo changes.
 
-## Private-repo auth: RESOLVED (spike complete, 2026-06-26)
+## Cloud (Web) install: findings + OPEN DECISION (2026-06-26)
 
-The design's biggest assumption is confirmed on both harnesses.
+A long spike mapped exactly how Claude Code on the Web reaches GitHub. Conclusions:
 
-- **CLI from private repo — VERIFIED.** `claude plugin marketplace add tenorune/didactic-robot`
-  clones the private repo over HTTPS via local `gh` credentials and validates;
-  `claude plugin install toolkit@didactic-robot` installs and enables it.
-- **Cloud environment from private repo — VERIFIED.** The Cloud environment Setup Script
-  (`claude plugin marketplace add` + `claude plugin install`) installed the private
-  same-owner marketplace and the `toolkit-smoke-test` skill loaded in the web session — with
-  **no token required**, consistent with the documented account-level GitHub access.
-- **Fallback (unused but documented):** if a future case lacks access, set `GITHUB_TOKEN`
-  (PAT, `repo` scope) in the environment, or use the tokenized-clone variant in
-  `setup/setup-script.sh`.
+- **Local CLI from the private repo — WORKS.** `claude plugin marketplace add
+  tenorune/didactic-robot` + `claude plugin install toolkit@didactic-robot` (uses local `gh`
+  credentials). This is the supported local path and `setup/setup-script.sh` does it.
+- **Web cloud — the private repo CANNOT be auto-loaded without per-repo committed files.**
+  The harness exposes three places to act, each with a hard limit for a *private* repo:
+  - **Setup Script (env-level, pollution-free):** runs as `root` *before* the session, has **no
+    `GH_TOKEN`**, and its git goes through a per-session proxy scoped to the *connected* repo —
+    so cloning a different private repo 403s. (A *public* repo clones fine here.) Anything it
+    writes to `~/.claude` is wiped by the harness re-init that runs afterward.
+  - **`/session-start-hook` (project hook):** the built-in command writes a **committed**
+    `<repo>/.claude/hooks/session-start.sh`. Runs in-session (has `GH_TOKEN`, can install the
+    private toolkit via REST tarball) — but it's a committed file in every repo, which the
+    no-identifiers / no-toolkit-refs rule forbids.
+  - **User-level `~/.claude/settings.json` hook:** not honored (harness manages `~/.claude`).
+- A *public* repo sidesteps all of this: the Setup Script installs it before the skill registry
+  builds → native skills, no token, no hooks, no project files.
 
-Both spike artifacts (the minimal `toolkit` plugin and `toolkit-smoke-test` skill) remain in
-the repo and become the seed the real assets are migrated into.
+Useful facts discovered: web sessions set `CLAUDE_CODE_REMOTE=true` and `CLAUDE_PROJECT_DIR`;
+the REST API (`api.github.com/.../tarball`, `Authorization: Bearer $GH_TOKEN`) bypasses the git
+proxy and works **in-session**; the git proxy rewrites `https://github.com/` →
+`http://local_proxy@127.0.0.1:PORT/git/` (see `~/.claude` memories for the full log).
 
-To investigate during planning/spike:
-- Does the cloud environment have git credentials (e.g. an injected `GITHUB_TOKEN`/`GH_TOKEN`,
-  or a connected GitHub account) that `claude plugin marketplace add` / `git clone` can use for
-  a private repo? Docs suggest auto-update auth uses `GITHUB_TOKEN`/`GH_TOKEN`, but manual
-  install during the setup script is unconfirmed.
-- If a token is needed, where is it set for the cloud environment, and can the setup script
-  `git clone https://<token>@github.com/<owner>/<repo>` or configure a credential helper?
+**OPEN DECISION (blocks finalizing the Web story):** pick one —
+1. **Make the repo PUBLIC** + Setup Script install. *Recommended.* Clean, deterministic, native
+   skills, no token/hooks/project-files. The no-identifiers rule exists to make this safe.
+2. **Private + Setup-Script-injected *uncommitted* project hook** (`<repo>/.claude/hooks/…`,
+   gitignored). Keeps it private; fragile (timing/persistence) and leaves untracked files.
+3. **Private + manual in-session install** each session (REST tarball).
+4. **Private, CLI-only** — auto-loads locally; install on demand in Web.
 
-Fallback options if private auth is impractical:
-1. **Public repo, no secrets.** Keep the repo public but guarantee zero identifiers/secrets
-   (this design already forbids identifiers). Simplest if nothing sensitive ever lives here.
-2. **PAT in setup script / env.** Use a fine-grained read-only token in the cloud env.
-3. **SSH deploy key** configured in the cloud environment.
-
-A small spike (try installing from the private repo in a real cloud environment) should be the
-first implementation step, since the chosen path affects the README and setup-script contents.
+The spike artifacts (`toolkit` plugin + `toolkit-smoke-test` skill) remain as the seed.
 
 ## Out of scope (deferred)
 
@@ -178,7 +172,7 @@ first implementation step, since the chosen path affects the README and setup-sc
 
 - A skill authored once in this repo is usable, unmodified, in both the CLI and a Web session.
 - No personal identifiers appear anywhere in the repo or its history.
-- Using the toolkit in Web requires only the Cloud environment Setup Script — **no project repo
-  ever references the toolkit, its repo, or its marketplace.**
-- The chosen private-vs-public + auth path actually installs the toolkit in a real cloud
-  environment (verified by spike, not assumed).
+- **No project repo ever references the toolkit, its repo, or its marketplace in a committed
+  file.** (Hard rule; constrains the Web install path — see the OPEN DECISION.)
+- Using the toolkit in Web works via the chosen install path (pending the open public-vs-private
+  decision), verified in a real cloud environment.

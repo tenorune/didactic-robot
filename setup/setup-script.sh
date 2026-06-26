@@ -1,15 +1,16 @@
 #!/bin/bash
-# Canonical "load everywhere" manifest for Claude Code.
+# LOCAL (CLI) installer for the toolkit + curated external skills.
+# Run once on a new machine (needs the `claude` CLI + `gh auth login` with access to the repo):
+#     gh repo clone tenorune/didactic-robot
+#     bash didactic-robot/setup/setup-script.sh
 #
-# Same script, both harnesses — only the invocation differs:
-#   - Cloud (Web): paste into the environment's "Setup script" field (or manage via /remote-env).
-#   - Local (CLI): run once on a new machine (needs the `claude` CLI + `gh auth login`):
-#         gh repo clone tenorune/didactic-robot
-#         bash didactic-robot/setup/setup-script.sh
+# NOTE — Claude Code on the WEB is NOT covered by this script while the repo is PRIVATE.
+# A private repo cannot be auto-loaded in a web session without per-repo committed files; see
+# docs/superpowers/specs/2026-06-26-shared-toolkit-design.md ("Cloud (Web) install: OPEN
+# DECISION"). If the repo is made PUBLIC, these same commands work as a web Setup Script.
 #
-# Design rule: the CORE toolkit (private, same-owner) MUST succeed. Curated EXTERNAL skills are
-# best-effort — in some cloud environments the git proxy 403s other-owner repos, and that must
-# never fail setup or block the session.
+# Design rule: the CORE toolkit MUST succeed. Curated EXTERNAL skills are best-effort — a
+# renamed/unreachable upstream must never abort setup.
 
 # ---------------------------------------------------------------------------------------
 # 1. Core: your own toolkit (private marketplace -> toolkit plugin). Must succeed.
