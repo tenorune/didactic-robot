@@ -1,36 +1,44 @@
 # Handoff — didactic-robot
 
 **What this is:** a private Claude Code plugin-marketplace repo (`tenorune/didactic-robot`) that
-stores project-agnostic skills / output styles / instruction-blocks / shared-memory as one plugin
-(`toolkit`), used via the Claude Code **CLI** (Web is out of scope — see below). Local path:
-`~/Public/didactic-robot`. (The README is intentionally one line; this HANDOFF is the operational
-source of truth.)
+stores project-agnostic skills, instruction-blocks, and shared memory as one plugin (`toolkit`,
+currently **v0.1.0**), used via the Claude Code **CLI** (Web is out of scope — see below). Local
+path: `~/Public/didactic-robot`. (The README is intentionally one line; this HANDOFF is the
+operational source of truth.)
 
 ## Repo layout (current)
 
 ```
-.claude-plugin/marketplace.json     # marketplace manifest (lists the `toolkit` plugin)
-plugins/toolkit/                     # the plugin
-  .claude-plugin/plugin.json
-  skills/toolkit-smoke-test/         # install-verification skill (seed)
+.claude-plugin/marketplace.json      # marketplace manifest (lists the `toolkit` plugin)
+.githooks/pre-commit                 # identifier/secret guard (enable: git config core.hooksPath .githooks)
+plugins/toolkit/
+  .claude-plugin/plugin.json         # v0.1.0
+  skills/handing-off-a-session/      # migrated personal skill
+  skills/shared-memory/              # reads memories on demand via ${CLAUDE_PLUGIN_ROOT}/memories/
+  skills/toolkit-smoke-test/         # install-verification skill
+  memories/                          # in-plugin shared-memory store: MEMORY.md index + fact-files
+instruction-blocks/                  # paste/@import CLAUDE.md snippets (README + dont-push-to-merge)
 setup/setup-script.sh                # LOCAL CLI installer (toolkit core + curated externals)
 docs/superpowers/specs/              # design spec — source of truth
+docs/superpowers/plans/              # implementation plan(s)
 docs/HANDOFF.md                      # this handoff
 ```
 
-## What's next (do this first)
+## What's next
 
-1. **DECISION — RESOLVED (2026-06-26): CLI-ONLY; repo stays PRIVATE; Web is out of scope.** A
-   public-repo experiment was tried and reverted after a cloud probe proved the Setup Script phase
-   403s *every* clone (own/other, public/private, `git clone` and `claude plugin marketplace add`
-   alike) — so "public" delivered no Web install, and the old "superpowers/VibeSec load via the
-   Setup Script" belief was never true in a project-connected environment. Web is deferred until
-   cloud-proxy behavior changes or a non-hack path appears. Full rationale: spec ("Cloud (Web)
-   install: findings + DECISION").
-2. **Build the toolkit contents — NOW the active task, scoped to the CLI:** inventory + migrate the
-   real assets — start with the `handing-off-a-session` skill (`~/.claude/skills/`), the global
-   CLAUDE.md "don't push to merge" rule → an instruction-block, output styles, and a
-   `shared-memory` skill. A `writing-plans` implementation plan was queued.
+**Nothing is in flight.** Toolkit **v0.1.0 is built, verified, and pushed** (`main` @ latest):
+`handing-off-a-session` + `shared-memory` + `toolkit-smoke-test` skills, `instruction-blocks/`,
+in-plugin `memories/`, and the pre-commit guard. Verified end-to-end: auto-loads on any project
+(offline, repo-private), new skills dispatch, `${CLAUDE_PLUGIN_ROOT}/memories/` resolves.
+
+Likely next steps when you return (all optional/incremental):
+1. **Add assets as they arise:** more skills into `plugins/toolkit/skills/`; the first real
+   **output style** into a new `plugins/toolkit/output-styles/` (none exist yet); more `memories/`
+   fact-files (keep `MEMORY.md` index in sync). Bump `version` in both manifests on changes, then
+   `claude plugin marketplace update didactic-robot` + uninstall/reinstall to refresh the cache.
+2. **Web stays deferred** (out of scope). Only revisit if cloud-proxy behavior changes; the one
+   untested thread is in-session clone behavior with `GH_TOKEN` (see Landmines).
+3. **`/insights`** session-analysis is deferred (spec "Out of scope").
 
 ## On-ramp / source of truth
 
@@ -105,9 +113,16 @@ the setup script, so a broken upstream never blocks the core toolkit.
 
 ## History (skip unless relevant — it's in git/spec)
 
-An earlier spike searched for a *private + automatic + pollution-free* Web install path. It does
-not exist given the harness design. A public-repo experiment was then tried and **reverted** once a
-cloud probe proved the Setup Script 403s every clone regardless of visibility — so the resolution
-is **CLI-only, repo private, Web deferred** (see "What's next" #1). The repo currently holds only
-the seed (`toolkit` plugin + `toolkit-smoke-test` skill). Full reasoning is in the spec and the
-`~/.claude` memories.
+- **Toolkit v0.1.0 built (2026-06-26):** migrated `handing-off-a-session`; added `instruction-blocks/`
+  (`dont-push-to-merge`), in-plugin `memories/` (index + `git-commit-identity` seed) and the
+  `shared-memory` skill; bumped manifests to CLI-only v0.1.0. Built via the plan in
+  `docs/superpowers/plans/`. Verified: auto-loads on any project; skills dispatch;
+  `${CLAUDE_PLUGIN_ROOT}/memories/` resolves to real files.
+- **Web-install decision (2026-06-26):** a spike sought a private + automatic + pollution-free Web
+  path; it doesn't exist. A public-repo experiment was tried and **reverted** once a cloud probe
+  proved the Setup Script 403s every clone regardless of visibility → resolution: CLI-only, repo
+  private, Web deferred. Full reasoning in the spec + `~/.claude` memories.
+- **PID cleanup (2026-06-26):** an identifier scan that *denylisted* the real email (thereby
+  embedding it) was replaced with a generic detector; git history was rewritten (`git filter-repo`)
+  to purge the leaked tokens; the `.githooks/pre-commit` guard now blocks recurrence. Stale
+  `…/cache/…/toolkit/0.0.1/` dir is harmless leftover.
