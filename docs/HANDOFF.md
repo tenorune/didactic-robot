@@ -46,12 +46,17 @@ This is a docs/config repo — no test suite. "Verification" =:
 ```bash
 jq empty .claude-plugin/marketplace.json plugins/toolkit/.claude-plugin/plugin.json
 bash -n setup/setup-script.sh
-grep -rniE '***REDACTED-ID-PATTERN***|ghp_|gho_' . --exclude-dir=.git --exclude=HANDOFF.md   # expect empty
+# identifier/secret scan — generic detector, filters in only the allowed noreply address (names no identifier):
+grep -rniE '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|ghp_[A-Za-z0-9]|gho_[A-Za-z0-9]' . --exclude-dir=.git | grep -vF '117549102+tenorune@users.noreply.github.com'   # expect empty
 ```
 Install locally (CLI): `claude plugin marketplace add tenorune/didactic-robot && claude plugin install toolkit@didactic-robot` (or run `setup/setup-script.sh`). Needs `gh auth` access to the private repo.
 Web: out of scope — the cloud Setup Script 403s every clone (see Landmines). Don't paste the setup
 script into a Web Setup Script field expecting it to work.
 Verify a session: ask Claude to **run the `toolkit-smoke-test` skill**.
+Auto-load (VERIFIED 2026-06-26 by spike): once installed at user scope + enabled in
+`~/.claude/settings.json`, the toolkit loads in **any** project dir, offline from the local
+marketplace clone — repo can stay private. A headless `claude -p` from a fresh unrelated dir
+dispatched `toolkit:toolkit-smoke-test`. Only manual step is the one-time per-machine install.
 External skills are **referenced from upstream, not vendored**, and installed **best-effort** in
 the setup script, so a broken upstream never blocks the core toolkit.
 

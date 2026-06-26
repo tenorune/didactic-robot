@@ -204,5 +204,10 @@ The spike artifacts (`toolkit` plugin + `toolkit-smoke-test` skill) remain as th
 - **No project repo ever references the toolkit, its repo, or its marketplace in a committed
   file.** (Hard rule; constrains the Web install path — see the OPEN DECISION.)
 - Using the toolkit in the **CLI** works via `claude plugin marketplace add` + install (the
-  decided scope, 2026-06-26). Web is explicitly deferred — no working pollution-free path exists
+  decided scope, 2026-06-26). **VERIFIED 2026-06-26 by spike:** once installed at user scope and
+  enabled in `~/.claude/settings.json`, the toolkit auto-loads in *any* project directory —
+  offline, from the local marketplace clone (`~/.claude/plugins/marketplaces/didactic-robot`), so
+  the repo staying private is irrelevant locally. A headless `claude -p` launched from a fresh,
+  unrelated dir dispatched `toolkit:toolkit-smoke-test` successfully. Only manual step: the
+  one-time install per machine. Web is explicitly deferred — no working pollution-free path exists
   given current cloud-proxy behavior.
