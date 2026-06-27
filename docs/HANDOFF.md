@@ -1,8 +1,8 @@
 # Handoff — didactic-robot
 
 **What this is:** a **public** Claude Code plugin-marketplace repo (`tenorune/didactic-robot`) that
-stores project-agnostic skills, instruction-blocks, and shared memory as one plugin (`toolkit`,
-currently **v0.3.0**), used via the Claude Code **CLI** and **Claude Code on the Web** (Web works
+stores project-agnostic skills, instruction-blocks, an output style, and shared memory as one plugin
+(`toolkit`, currently **v0.3.1**), used via the Claude Code **CLI** and **Claude Code on the Web** (Web works
 with conditions — see below). Local path: `~/Public/didactic-robot`. (The README is intentionally
 one line; this HANDOFF is the operational source of truth.) NOTE: the repo is **public**
 (since 2026-06-26) to enable the Web path; the no-personal-identifiers rule keeps this safe.
@@ -13,11 +13,12 @@ one line; this HANDOFF is the operational source of truth.) NOTE: the repo is **
 .claude-plugin/marketplace.json      # marketplace manifest (lists the `toolkit` plugin)
 .githooks/pre-commit                 # identifier/secret guard (enable: git config core.hooksPath .githooks)
 plugins/toolkit/
-  .claude-plugin/plugin.json         # v0.3.0
+  .claude-plugin/plugin.json         # v0.3.1
   skills/handing-off-a-session/      # migrated personal skill
   skills/shared-memory/              # reads memories on demand via ${CLAUDE_PLUGIN_ROOT}/memories/
   skills/toolkit-smoke-test/         # install-verification skill
   skills/vetting-ui-changes/         # web-UI vetting discipline skill (added v0.2.0)
+  output-styles/disciplined.md       # always-on working posture; opt-in via /output-style (added v0.3.1)
   memories/                          # in-plugin shared-memory store: MEMORY.md index + 21 fact-files
 instruction-blocks/                  # paste/@import CLAUDE.md snippets (README + dont-push-to-merge)
 setup/setup-script.sh                # LOCAL CLI installer (toolkit core + curated externals)
@@ -28,17 +29,20 @@ docs/HANDOFF.md                      # this handoff
 
 ## What's next
 
-**Nothing is in flight.** `main` @ `c829c75`, clean, pushed; toolkit **v0.3.0**. Shipped work lives
-in git + specs/plans; this section is forward-only. Two things shipped since v0.1.0: the
-**`vetting-ui-changes`** skill (v0.2.0) and a **21-entry cross-project shared-memory set** under
-`plugins/toolkit/memories/` (v0.3.0).
+**Nothing is in flight.** `main` and `dev` in sync at the **v0.3.1** bump merge (run `git log --oneline -1`
+for the tip), clean, **not yet pushed**. Shipped work lives in git + specs/plans; this section is
+forward-only. Shipped since v0.1.0: the **`vetting-ui-changes`** skill (v0.2.0), a **21-entry
+cross-project shared-memory set** under `plugins/toolkit/memories/` (v0.3.0), and the first **output
+style** `disciplined` (v0.3.1).
 
 Next steps when you return (all optional/incremental):
-1. **Add assets as they arise:** more skills into `plugins/toolkit/skills/`; the first **output
-   style** into a new `plugins/toolkit/output-styles/` (none exist yet); more `memories/` fact-files
-   (keep `MEMORY.md` index in sync). **Version bumps only when you ask** — a batch of related work is
-   one bump, not one per commit; then `claude plugin marketplace update didactic-robot` +
-   reinstall to refresh the cache.
+0. **Push + refresh:** `main`/`dev` are committed but unpushed. When ready: push, then
+   `claude plugin marketplace update didactic-robot` + reinstall + **restart** to load v0.3.1, and
+   live-test the `disciplined` style via `/output-style` (a live session pins the old plugin cache).
+1. **Add assets as they arise:** more skills into `plugins/toolkit/skills/`; more **output styles** into
+   `plugins/toolkit/output-styles/` (the slot now exists — `disciplined.md` is the first); more
+   `memories/` fact-files (keep `MEMORY.md` index in sync). **Version bumps only when you ask** — a batch
+   of related work is one bump, not one per commit.
 2. **Deferred memory tiers:** a triaged list of further cross-project memories was *not* added —
    Tier 3 (library design: n=1-abstraction, runtime-agnostic-core, fail-closed-defaults,
    injected-clock, upstream-staging) and ~14 niche Tier-4 items. Revisit if wanted.
@@ -92,7 +96,7 @@ re-run); it is NOT "best-effort externals."
 - **Develop on branches** (changed 2026-06-27, supersedes the old "work on `main`"): feature branch
   → `dev` integration branch → `main`. You create and work the feature branch; **do NOT merge/PR,
   push, or bump versions unless asked.** A version bump marks a *significant* change (a feature, or a
-  batch of related work) — not every commit. `main` and `dev` are currently in sync @ `c829c75`.
+  batch of related work) — not every commit. `main` and `dev` are currently in sync at the v0.3.1 bump.
 
 ## Human's working style
 
@@ -132,6 +136,13 @@ re-run); it is NOT "best-effort externals."
 
 ## History (skip unless relevant — it's in git/spec)
 
+- **`disciplined` output style (2026-06-27, v0.3.1):** first toolkit output style, under
+  `plugins/toolkit/output-styles/`. Encodes the always-on *interaction posture + restraint* subset of
+  the conventions (terse-cue momentum, bounded choices, OBSERVED-vs-UNKNOWN evidence, no unprompted
+  commit/push/bump/merge, "done is the operator's call"); voice = principle+why under one thesis.
+  `keep-coding-instructions: true`, `force-for-plugin: false` (opt-in, never auto-applied). Task
+  procedures stay in skills, reference facts stay in memory — see the selection principle in
+  `docs/superpowers/specs/2026-06-27-disciplined-output-style-design.md`.
 - **Shared-memory set + branch workflow (2026-06-27, v0.3.0):** added 21 cross-project memories under
   `plugins/toolkit/memories/` (working-style, release/publish, library-design, identity), distilled
   from this repo's work + a mining pass across `~/Public` and `github.com/tenorune` handoff/convention
