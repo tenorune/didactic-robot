@@ -85,7 +85,7 @@ didactic-robot/
 | Asset | Lives in | CLI | Web | Notes |
 |-------|----------|:---:|:---:|-------|
 | Skills | `plugins/toolkit/skills/` | ✅ | ✅ | Namespaced `toolkit:<skill>`; auto-discovered once the plugin is installed via the setup script |
-| Output styles | `plugins/toolkit/output-styles/` | ✅ | ✅ | Selected via `/output-style`; bundled in the plugin |
+| Output styles | `plugins/toolkit/output-styles/` | ✅ | ✅ | Selected via `/config` → Output style (the `/output-style` command was removed in CLI v2.1.91); bundled in the plugin |
 | Instruction blocks | `instruction-blocks/` | ✅ | ✅ | Plain markdown library; pasted or `@import`ed into a CLAUDE.md. Not auto-loaded by design |
 | Memories | `memories/` + `shared-memory` skill | ✅ | ✅ | Files are inert; the `shared-memory` skill makes them discoverable and reads them on demand |
 | External skills (others') | referenced in `setup/setup-script.sh` | ✅ | ✅ | NOT copied. The setup script installs them from upstream (marketplace plugin, or `git clone` into `~/.claude/skills/`) so they update at the source and keep attribution |

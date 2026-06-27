@@ -20,11 +20,18 @@ docs and forget the message.
 
 ## Procedure
 
-1. **Verify state — never hand off red.** Run the project's tests and build; confirm the working tree is
-   clean. Report the actual results. If something fails, fix it or flag it explicitly in the handoff —
-   don't paper over it.
-2. **Finish the branch.** REQUIRED SUB-SKILL: superpowers:finishing-a-development-branch (merge / PR /
-   keep / discard). Do this before writing the handoff so the recorded state is final.
+1. **Verify state — never hand off red.** Run the project's tests and build. Report the actual results.
+   If something fails, fix it or flag it explicitly in the handoff — don't paper over it.
+2. **Reconcile pending git state with the human — don't hand off a half-finished tree.** A clean working
+   tree is not enough. Check all three and report what you find: uncommitted changes (`git status`),
+   unmerged branches, and **unpushed commits** (compare each local branch tip — `main`, `dev`, the
+   feature branch — against its `origin/…` counterpart; `git status` says nothing about unpushed
+   commits). If ANY exist, surface them and **ask the human how to resolve, as bounded options, BEFORE
+   writing the handoff** — e.g. "commit / leave staged", "merge to dev / keep the branch", "push now /
+   leave unpushed". A "don't commit/merge/push unless asked" convention means don't do it *silently* — it
+   does **not** mean skip asking; the handoff is the moment to ask. Then finish the branch per REQUIRED
+   SUB-SKILL: superpowers:finishing-a-development-branch (merge / PR / keep / discard). The handoff must
+   record the state the human **chose**, not a default half-state they have to come back and fix.
 3. **Update the durable artifacts** — only the ones the project actually uses, each in the Shape below:
    - **Auto-loaded memory / status note** (the real always-current on-ramp): current state in 1–2 lines +
      what's next + open follow-ups.
@@ -62,9 +69,12 @@ Two properties make or break it:
 | Led with status of finished work | History goes in a skippable tail, below `---`. |
 | Bare codenames ("Phase 3", "Foundation B") | Define inline in one line, or cut. |
 | Handed off without running tests/build | Verify state first; never hand off red. |
+| Documented "unpushed"/"uncommitted" state in the handoff without asking | That's the half-finished tree the human then has to fix. Reconcile first (step 2): surface uncommitted/unmerged/unpushed, ask how to resolve, record the chosen state. |
+| Read "don't push/merge unless asked" as "don't ask" | It means don't do it silently. The handoff is exactly when to ask. |
 | Restated detail already in git/plans/specs | Point to the source; keep the handoff thin. |
 
 ## Quick reference
 
-verify (tests + build + clean tree) → finish branch → update memory/roadmap/handoff (forward-first) →
+verify (tests + build) → reconcile git state with the human (uncommitted / unmerged / **unpushed** —
+ask, don't assume) → finish branch → update memory/roadmap/handoff (forward-first) →
 **emit the paste-ready message**.

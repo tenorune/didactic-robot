@@ -9,7 +9,7 @@
     {
       "name": "toolkit",
       "description": "Project-agnostic skills, instruction-blocks, and shared-memory access for the Claude Code CLI and Web.",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "source": "./plugins/toolkit",
       "author": {
         "name": "tenorune",

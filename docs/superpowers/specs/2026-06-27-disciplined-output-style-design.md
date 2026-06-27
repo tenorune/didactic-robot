@@ -63,8 +63,9 @@ evidence; no unprompted commit/push/bump/merge + no merge-nudging; "done" is the
 - File parses as frontmatter + body (valid YAML frontmatter, known fields only).
 - Manifests unchanged: `jq empty .claude-plugin/marketplace.json plugins/toolkit/.claude-plugin/plugin.json`.
 - Identifier scan stays empty (generic detector, filters in only the allowed noreply).
-- Live confirmation deferred to the operator: select via `/output-style` after install + restart (a live
-  session pins its plugin-cache snapshot).
+- Live confirmation deferred to the operator: select via `/config` → Output style after install +
+  restart (a live session pins its plugin-cache snapshot). The `/output-style` command was removed in
+  CLI v2.1.91; if the style isn't listed, `/reload-plugins` then reopen `/config`.
 
 ## Out of scope / deferred
 
