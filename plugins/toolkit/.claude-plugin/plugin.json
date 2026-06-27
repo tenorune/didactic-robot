@@ -1,7 +1,7 @@
 {
   "name": "toolkit",
   "description": "Project-agnostic skills, instruction-blocks, and shared-memory access for the Claude Code CLI and Web.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "tenorune",
     "email": "117549102+tenorune@users.noreply.github.com"
