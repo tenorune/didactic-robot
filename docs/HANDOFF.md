@@ -2,7 +2,7 @@
 
 **What this is:** a **public** Claude Code plugin-marketplace repo (`tenorune/didactic-robot`) that
 stores project-agnostic skills, instruction-blocks, an output style, and shared memory as one plugin
-(`toolkit`, currently **v0.3.1**), used via the Claude Code **CLI** and **Claude Code on the Web** (Web works
+(`toolkit`, currently **v0.3.2**), used via the Claude Code **CLI** and **Claude Code on the Web** (Web works
 with conditions — see below). Local path: `~/Public/didactic-robot`. (The README is intentionally
 one line; this HANDOFF is the operational source of truth.) NOTE: the repo is **public**
 (since 2026-06-26) to enable the Web path; the no-personal-identifiers rule keeps this safe.
@@ -13,8 +13,8 @@ one line; this HANDOFF is the operational source of truth.) NOTE: the repo is **
 .claude-plugin/marketplace.json      # marketplace manifest (lists the `toolkit` plugin)
 .githooks/pre-commit                 # identifier/secret guard (enable: git config core.hooksPath .githooks)
 plugins/toolkit/
-  .claude-plugin/plugin.json         # v0.3.1
-  skills/handing-off-a-session/      # migrated personal skill
+  .claude-plugin/plugin.json         # v0.3.2
+  skills/handing-off-a-session/      # canonical handoff skill; reconcile-git-state step added v0.3.2
   skills/shared-memory/              # reads memories on demand via ${CLAUDE_PLUGIN_ROOT}/memories/
   skills/toolkit-smoke-test/         # install-verification skill
   skills/vetting-ui-changes/         # web-UI vetting discipline skill (added v0.2.0)
@@ -29,17 +29,20 @@ docs/HANDOFF.md                      # this handoff
 
 ## What's next
 
-**Nothing is in flight.** `main` and `dev` in sync at the **v0.3.1** bump merge (run `git log --oneline -1`
-for the tip), clean, **not yet pushed**. Shipped work lives in git + specs/plans; this section is
-forward-only. Shipped since v0.1.0: the **`vetting-ui-changes`** skill (v0.2.0), a **21-entry
-cross-project shared-memory set** under `plugins/toolkit/memories/` (v0.3.0), and the first **output
-style** `disciplined` (v0.3.1).
+**Nothing is in flight.** `main` and `dev` in sync at the **v0.3.2** state and **pushed** (`origin/main`
+= `origin/dev`; run `git log --oneline -1` for the exact tip), working tree clean. Shipped work lives in
+git + specs/plans; this section is forward-only. Shipped since v0.1.0: the **`vetting-ui-changes`** skill
+(v0.2.0), a **21-entry cross-project shared-memory set** under `plugins/toolkit/memories/` (v0.3.0), the
+first **output style** `disciplined` (v0.3.1), and the handoff skill's **reconcile-git-state** step
+(v0.3.2).
 
 Next steps when you return (all optional/incremental):
-0. **Push + refresh:** `main`/`dev` are committed but unpushed. When ready: push, then
-   `claude plugin marketplace update didactic-robot` + reinstall + **restart** to load v0.3.1, and
-   live-test the `disciplined` style via **`/config` → Output style** (NOT `/output-style` — that command
-   was removed in CLI v2.1.91; if the style isn't listed, run `/reload-plugins` then reopen `/config`).
+0. **Update the active install to v0.3.2:** source is pushed, but the active install is still **v0.3.1**
+   (a live session also pins its old plugin-cache snapshot). To move to v0.3.2:
+   `claude plugin update toolkit@didactic-robot` + **restart**. Then live-test the `disciplined` style via
+   **`/config` → Output style** (NOT `/output-style` — removed in CLI v2.1.91; if it's not listed, run
+   `/reload-plugins` then reopen `/config`). NB: the old standalone `~/.claude/skills/handing-off-a-session`
+   was removed and superseded toolkit caches (`0.0.1`–`0.2.0`) were cleared — it's plugin-only now.
 1. **Add assets as they arise:** more skills into `plugins/toolkit/skills/`; more **output styles** into
    `plugins/toolkit/output-styles/` (the slot now exists — `disciplined.md` is the first); more
    `memories/` fact-files (keep `MEMORY.md` index in sync). **Version bumps only when you ask** — a batch
@@ -137,6 +140,13 @@ re-run); it is NOT "best-effort externals."
 
 ## History (skip unless relevant — it's in git/spec)
 
+- **Handoff skill reconcile-git-state step + housekeeping (2026-06-27, v0.3.2):** `handing-off-a-session`
+  now requires checking uncommitted / unmerged / **unpushed** state and asking the human (bounded options)
+  BEFORE writing the handoff, instead of documenting a half-finished tree (cuts off the "don't push unless
+  asked → so don't ask" misread). Built RED→GREEN with subagent pressure tests per superpowers:writing-skills.
+  Same commit corrected stale `/output-style` → `/config` → Output style refs (CLI removed `/output-style`
+  in v2.1.91). Also removed the old standalone `~/.claude/skills/handing-off-a-session` and cleared
+  superseded toolkit caches so the skill is plugin-only. Merge tip after this handoff doc update.
 - **`disciplined` output style (2026-06-27, v0.3.1):** first toolkit output style, under
   `plugins/toolkit/output-styles/`. Encodes the always-on *interaction posture + restraint* subset of
   the conventions (terse-cue momentum, bounded choices, OBSERVED-vs-UNKNOWN evidence, no unprompted
