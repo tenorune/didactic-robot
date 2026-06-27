@@ -2,7 +2,7 @@
 
 **What this is:** a **public** Claude Code plugin-marketplace repo (`tenorune/didactic-robot`) that
 stores project-agnostic skills, instruction-blocks, an output style, and shared memory as one plugin
-(`toolkit`, currently **v0.3.2**), used via the Claude Code **CLI** and **Claude Code on the Web** (Web works
+(`toolkit`, currently **v0.3.3**), used via the Claude Code **CLI** and **Claude Code on the Web** (Web works
 with conditions — see below). Local path: `~/Public/didactic-robot`. (The README is intentionally
 one line; this HANDOFF is the operational source of truth.) NOTE: the repo is **public**
 (since 2026-06-26) to enable the Web path; the no-personal-identifiers rule keeps this safe.
@@ -13,48 +13,46 @@ one line; this HANDOFF is the operational source of truth.) NOTE: the repo is **
 .claude-plugin/marketplace.json      # marketplace manifest (lists the `toolkit` plugin)
 .githooks/pre-commit                 # identifier/secret guard (enable: git config core.hooksPath .githooks)
 plugins/toolkit/
-  .claude-plugin/plugin.json         # v0.3.2
+  .claude-plugin/plugin.json         # v0.3.3
   skills/handing-off-a-session/      # canonical handoff skill; reconcile-git-state step added v0.3.2
   skills/shared-memory/              # reads memories on demand via ${CLAUDE_PLUGIN_ROOT}/memories/
   skills/toolkit-smoke-test/         # install-verification skill
   skills/vetting-ui-changes/         # web-UI vetting discipline skill (added v0.2.0)
   output-styles/disciplined.md       # always-on working posture; opt-in via /config → Output style (added v0.3.1)
-  memories/                          # in-plugin shared-memory store: MEMORY.md index + 21 fact-files
-instruction-blocks/                  # paste/@import CLAUDE.md snippets (README + dont-push-to-merge)
+  memories/                          # in-plugin shared-memory store: MEMORY.md index + 24 fact-files
+instruction-blocks/                  # paste/@import CLAUDE.md snippets — 6 blocks + README (placeholder @import + import-all)
 setup/setup-script.sh                # LOCAL CLI installer (toolkit core + curated externals)
 docs/superpowers/specs/              # design specs — source of truth
 docs/superpowers/plans/              # implementation plans
+docs/candidate-memories/             # tracked-but-NOT-shipped memory drafts (README + 2 candidates)
 docs/HANDOFF.md                      # this handoff
 ```
 
 ## What's next
 
-**Nothing is in flight.** `main` and `dev` in sync at the **v0.3.2** state and **pushed** (`origin/main`
-= `origin/dev`; run `git log --oneline -1` for the exact tip), working tree clean. Shipped work lives in
-git + specs/plans; this section is forward-only. Shipped since v0.1.0: the **`vetting-ui-changes`** skill
-(v0.2.0), a **21-entry cross-project shared-memory set** under `plugins/toolkit/memories/` (v0.3.0), the
-first **output style** `disciplined` (v0.3.1), and the handoff skill's **reconcile-git-state** step
-(v0.3.2).
+**Nothing is in flight.** `main` and `dev` in sync at **v0.3.3** and **pushed** (`origin/main` =
+`origin/dev`; `git log --oneline -1` for the exact tip), working tree clean, no open branches. This
+section is forward-only — shipped work lives in git + specs/plans (compressed in History below).
 
 Next steps when you return (all optional/incremental):
-0. **Update the active install to v0.3.2:** source is pushed, but the active install is still **v0.3.1**
-   (a live session also pins its old plugin-cache snapshot). To move to v0.3.2:
-   `claude plugin update toolkit@didactic-robot` + **restart**. Then live-test the `disciplined` style via
-   **`/config` → Output style** (NOT `/output-style` — removed in CLI v2.1.91; if it's not listed, run
-   `/reload-plugins` then reopen `/config`). NB: the old standalone `~/.claude/skills/handing-off-a-session`
-   was removed and superseded toolkit caches (`0.0.1`–`0.2.0`) were cleared — it's plugin-only now.
+0. **Update the active install to v0.3.3:** source is pushed at v0.3.3, but a running session pins the
+   plugin-cache snapshot it started with (this session ran the **0.3.2** cache). To move up:
+   `claude plugin update toolkit@didactic-robot` + **restart**. The `disciplined` output style is
+   confirmed selectable and active — this session ran under it (select via `/config` → Output style; the
+   old `/output-style` command was removed in CLI v2.1.91).
 1. **Add assets as they arise:** more skills into `plugins/toolkit/skills/`; more **output styles** into
-   `plugins/toolkit/output-styles/` (the slot now exists — `disciplined.md` is the first); more
-   `memories/` fact-files (keep `MEMORY.md` index in sync). **Version bumps only when you ask** — a batch
-   of related work is one bump, not one per commit.
-2. **Deferred memory tiers — resolved (2026-06-27).** Tier 3 triaged: shipped `n=1-abstraction`,
-   `runtime-agnostic-core`, and `fail-closed-defaults` into `plugins/toolkit/memories/` (index now
-   24 entries); dropped `injected-clock` and `upstream-staging`. The ~14 Tier-4 items were never
-   recorded anywhere and are dropped. Nothing remains deferred here. (On `feature/tier3-library-memories`
-   until merged.)
+   `plugins/toolkit/output-styles/` (`disciplined.md` is the first); more `memories/` fact-files (keep
+   `MEMORY.md` index in sync — now 24). **Version bumps only when you ask.**
+2. **Promote or drop the candidate memories** in `docs/candidate-memories/` (tracked but NOT loaded by the
+   plugin): `memory-portability-audience` (portable-vs-local placement rule — likely ships) and
+   `backup-claude-state-for-machine-switching` (scrubbed personal-infra practice — may stay candidate or
+   user-level only). Promote = move into `plugins/toolkit/memories/` + add to `MEMORY.md`.
 3. **Web run-twice (optional):** unchanged — the Web Setup Script must be run twice per repo (first
    run fails, second succeeds); mechanism unexplained, in-script retry already ruled out. Only probe
    if it becomes annoying — see Landmines + the `cloud-git-proxy-blocks-other-owner-repos` memory.
+4. **Other-Mac transcript mining (optional, future):** `bsky-saves-gui` on `toy-23.local` holds 1061
+   session transcripts but 0 memories — a possible harvest if ever wanted. Separate effort; the SSH
+   access used this session was ad-hoc and is now closed.
 
 ## On-ramp / source of truth
 
@@ -102,7 +100,7 @@ re-run); it is NOT "best-effort externals."
 - **Develop on branches** (changed 2026-06-27, supersedes the old "work on `main`"): feature branch
   → `dev` integration branch → `main`. You create and work the feature branch; **do NOT merge/PR,
   push, or bump versions unless asked.** A version bump marks a *significant* change (a feature, or a
-  batch of related work) — not every commit. `main` and `dev` are currently in sync at the v0.3.1 bump.
+  batch of related work) — not every commit. `main` and `dev` are currently in sync at the v0.3.3 bump.
 
 ## Human's working style
 
@@ -142,6 +140,16 @@ re-run); it is NOT "best-effort externals."
 
 ## History (skip unless relevant — it's in git/spec)
 
+- **Instruction-blocks expansion + cross-Mac memory harvest (2026-06-27, v0.3.3):** added 5
+  instruction-blocks (`git-commit-identity`, `evidence-before-claims`, `branch-workflow`,
+  `pristine-commits`, `commit-and-version-restraint`) each with a concrete `@import` line using a
+  `<path-to-didactic-robot>` placeholder, plus an "import them all" README section. Harvested over SSH
+  from another Mac (`toy-23.local`): folded a "check latest tag, don't guess" note into
+  `version-bumps-ask-first`, and staged 2 candidate memories under `docs/candidate-memories/` (tracked,
+  not shipped). Shipped 3 Tier-3 library-design memories (`n=1-abstraction`, `runtime-agnostic-core`,
+  `fail-closed-defaults`; index 21→24); dropped `injected-clock`, `upstream-staging`, and the unrecorded
+  ~14 Tier-4 items. Identifiers scrubbed throughout — a real Proton email surfaced in a harvested memory
+  and was excluded.
 - **Handoff skill reconcile-git-state step + housekeeping (2026-06-27, v0.3.2):** `handing-off-a-session`
   now requires checking uncommitted / unmerged / **unpushed** state and asking the human (bounded options)
   BEFORE writing the handoff, instead of documenting a half-finished tree (cuts off the "don't push unless
