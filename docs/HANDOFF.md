@@ -47,9 +47,11 @@ Next steps when you return (all optional/incremental):
    `plugins/toolkit/output-styles/` (the slot now exists — `disciplined.md` is the first); more
    `memories/` fact-files (keep `MEMORY.md` index in sync). **Version bumps only when you ask** — a batch
    of related work is one bump, not one per commit.
-2. **Deferred memory tiers:** a triaged list of further cross-project memories was *not* added —
-   Tier 3 (library design: n=1-abstraction, runtime-agnostic-core, fail-closed-defaults,
-   injected-clock, upstream-staging) and ~14 niche Tier-4 items. Revisit if wanted.
+2. **Deferred memory tiers — resolved (2026-06-27).** Tier 3 triaged: shipped `n=1-abstraction`,
+   `runtime-agnostic-core`, and `fail-closed-defaults` into `plugins/toolkit/memories/` (index now
+   24 entries); dropped `injected-clock` and `upstream-staging`. The ~14 Tier-4 items were never
+   recorded anywhere and are dropped. Nothing remains deferred here. (On `feature/tier3-library-memories`
+   until merged.)
 3. **Web run-twice (optional):** unchanged — the Web Setup Script must be run twice per repo (first
    run fails, second succeeds); mechanism unexplained, in-script retry already ruled out. Only probe
    if it becomes annoying — see Landmines + the `cloud-git-proxy-blocks-other-owner-repos` memory.

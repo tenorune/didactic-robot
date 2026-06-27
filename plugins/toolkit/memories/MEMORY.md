@@ -23,3 +23,6 @@ One line per fact-file. Read a file only when its hook matches the current task;
 - [Ship safe part first](ship-safe-part-first.md) — ship the clean part now; file the risky remainder as its own issue
 - [No memory rules in repo](no-memory-rules-in-repo.md) — centralize personal rules; project repos hold technical conventions only
 - [Ask before bumping versions](version-bumps-ask-first.md) — never bump a version unprompted; versioning marks significant changes, not every commit
+- [n=1 abstraction](n=1-abstraction.md) — don't abstract from a single instance; wait for the 2nd/3rd real use before generalizing
+- [Runtime-agnostic core](runtime-agnostic-core.md) — keep core logic platform-neutral; isolate host bindings at thin edges
+- [Fail-closed defaults](fail-closed-defaults.md) — on error/uncertainty default to the safe/restrictive state, never permissive
