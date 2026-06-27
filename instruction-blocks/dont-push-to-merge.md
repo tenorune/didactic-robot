@@ -1,6 +1,11 @@
 # Don't push to merge
 
-Paste the section below into a project's `CLAUDE.md` (or `@import` it) to stop merge-nudging.
+Paste the section below into a project's `CLAUDE.md` to stop merge-nudging. Or `@import` the
+file instead:
+
+```
+@<path-to-didactic-robot>/instruction-blocks/dont-push-to-merge.md
+```
 
 ## Workflow: don't push to merge
 
