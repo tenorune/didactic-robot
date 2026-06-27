@@ -18,7 +18,7 @@ plugins/toolkit/
   skills/shared-memory/              # reads memories on demand via ${CLAUDE_PLUGIN_ROOT}/memories/
   skills/toolkit-smoke-test/         # install-verification skill
   skills/vetting-ui-changes/         # web-UI vetting discipline skill (added v0.2.0)
-  output-styles/disciplined.md       # always-on working posture; opt-in via /output-style (added v0.3.1)
+  output-styles/disciplined.md       # always-on working posture; opt-in via /config → Output style (added v0.3.1)
   memories/                          # in-plugin shared-memory store: MEMORY.md index + 21 fact-files
 instruction-blocks/                  # paste/@import CLAUDE.md snippets (README + dont-push-to-merge)
 setup/setup-script.sh                # LOCAL CLI installer (toolkit core + curated externals)
@@ -38,7 +38,8 @@ style** `disciplined` (v0.3.1).
 Next steps when you return (all optional/incremental):
 0. **Push + refresh:** `main`/`dev` are committed but unpushed. When ready: push, then
    `claude plugin marketplace update didactic-robot` + reinstall + **restart** to load v0.3.1, and
-   live-test the `disciplined` style via `/output-style` (a live session pins the old plugin cache).
+   live-test the `disciplined` style via **`/config` → Output style** (NOT `/output-style` — that command
+   was removed in CLI v2.1.91; if the style isn't listed, run `/reload-plugins` then reopen `/config`).
 1. **Add assets as they arise:** more skills into `plugins/toolkit/skills/`; more **output styles** into
    `plugins/toolkit/output-styles/` (the slot now exists — `disciplined.md` is the first); more
    `memories/` fact-files (keep `MEMORY.md` index in sync). **Version bumps only when you ask** — a batch
