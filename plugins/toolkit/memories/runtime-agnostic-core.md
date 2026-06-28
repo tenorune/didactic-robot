@@ -9,4 +9,4 @@ Keep the core logic of a tool independent of any one runtime, platform, or host.
 
 **Why:** A core entangled with one runtime can't be ported, reused, or tested without dragging that runtime along. Tools meant to run across environments (e.g. a CLI and a web build) depend on the core staying neutral.
 
-**How to apply:** Define the core in terms of plain inputs/outputs and injected dependencies, not direct calls to host APIs. Adapt at the boundary — one small layer per platform. When a platform detail leaks into the core, treat it as a design smell and push it outward. Related: [[publishable-tooling-defaults]].
+**How to apply:** Define the core in terms of plain inputs/outputs and injected dependencies, not direct calls to host APIs. Adapt at the boundary — one small layer per platform. When a platform detail leaks into the core, treat it as a design smell and push it outward. Prefer reusable, modular scaffolding over one-offs when more pieces are likely, and lean on a platform's native capability before adding new infrastructure to satisfy a requirement. Related: [[publishable-tooling-defaults]], [[ship-safe-part-first]].
