@@ -2,7 +2,7 @@
 
 **What this is:** a **public** Claude Code plugin-marketplace repo (`tenorune/didactic-robot`) that
 stores project-agnostic skills, instruction-blocks, an output style, and shared memory as one plugin
-(`toolkit`, currently **v0.3.3**), used via the Claude Code **CLI** and **Claude Code on the Web** (Web works
+(`toolkit`, currently **v0.4.0**), used via the Claude Code **CLI** and **Claude Code on the Web** (Web works
 with conditions — see below). Local path: `~/Public/didactic-robot`. (The README is intentionally
 one line; this HANDOFF is the operational source of truth.) NOTE: the repo is **public**
 (since 2026-06-26) to enable the Web path; the no-personal-identifiers rule keeps this safe.
@@ -13,46 +13,44 @@ one line; this HANDOFF is the operational source of truth.) NOTE: the repo is **
 .claude-plugin/marketplace.json      # marketplace manifest (lists the `toolkit` plugin)
 .githooks/pre-commit                 # identifier/secret guard (enable: git config core.hooksPath .githooks)
 plugins/toolkit/
-  .claude-plugin/plugin.json         # v0.3.3
+  .claude-plugin/plugin.json         # v0.4.0
   skills/handing-off-a-session/      # canonical handoff skill; reconcile-git-state step added v0.3.2
   skills/shared-memory/              # reads memories on demand via ${CLAUDE_PLUGIN_ROOT}/memories/
   skills/toolkit-smoke-test/         # install-verification skill
   skills/vetting-ui-changes/         # web-UI vetting discipline skill (added v0.2.0)
   output-styles/disciplined.md       # always-on working posture; opt-in via /config → Output style (added v0.3.1)
-  memories/                          # in-plugin shared-memory store: MEMORY.md index + 24 fact-files
+  memories/                          # in-plugin shared-memory store: MEMORY.md index + 30 fact-files
 instruction-blocks/                  # paste/@import CLAUDE.md snippets — 6 blocks + README (placeholder @import + import-all)
 setup/setup-script.sh                # LOCAL CLI installer (toolkit core + curated externals)
 docs/superpowers/specs/              # design specs — source of truth
 docs/superpowers/plans/              # implementation plans
-docs/candidate-memories/             # tracked-but-NOT-shipped memory drafts (README + 2 candidates)
+docs/candidate-memories/             # tracked-but-NOT-shipped memory drafts (README + 6 candidates + fold record)
 docs/HANDOFF.md                      # this handoff
 ```
 
 ## What's next
 
-**Nothing is in flight.** `main` and `dev` in sync at **v0.3.3** and **pushed** (`origin/main` =
+**Nothing is in flight.** `main` and `dev` in sync at **v0.4.0** and **pushed** (`origin/main` =
 `origin/dev`; `git log --oneline -1` for the exact tip), working tree clean, no open branches. This
-section is forward-only — shipped work lives in git + specs/plans (compressed in History below).
+section is forward-only — shipped work lives in git (the harvest worksheet is local-only, see History).
 
 Next steps when you return (all optional/incremental):
-0. **Update the active install to v0.3.3:** source is pushed at v0.3.3, but a running session pins the
+0. **Update the active install to v0.4.0:** source is pushed at v0.4.0, but a running session pins the
    plugin-cache snapshot it started with (this session ran the **0.3.2** cache). To move up:
-   `claude plugin update toolkit@didactic-robot` + **restart**. The `disciplined` output style is
-   confirmed selectable and active — this session ran under it (select via `/config` → Output style; the
-   old `/output-style` command was removed in CLI v2.1.91).
-1. **Add assets as they arise:** more skills into `plugins/toolkit/skills/`; more **output styles** into
-   `plugins/toolkit/output-styles/` (`disciplined.md` is the first); more `memories/` fact-files (keep
-   `MEMORY.md` index in sync — now 24). **Version bumps only when you ask.**
-2. **Promote or drop the candidate memories** in `docs/candidate-memories/` (tracked but NOT loaded by the
-   plugin): `memory-portability-audience` (portable-vs-local placement rule — likely ships) and
-   `backup-claude-state-for-machine-switching` (scrubbed personal-infra practice — may stay candidate or
-   user-level only). Promote = move into `plugins/toolkit/memories/` + add to `MEMORY.md`.
-3. **Web run-twice (optional):** unchanged — the Web Setup Script must be run twice per repo (first
-   run fails, second succeeds); mechanism unexplained, in-script retry already ruled out. Only probe
-   if it becomes annoying — see Landmines + the `cloud-git-proxy-blocks-other-owner-repos` memory.
-4. **Other-Mac transcript mining (optional, future):** `bsky-saves-gui` on `toy-23.local` holds 1061
-   session transcripts but 0 memories — a possible harvest if ever wanted. Separate effort; the SSH
-   access used this session was ad-hoc and is now closed.
+   `claude plugin update toolkit@didactic-robot` + **restart**.
+1. **Sift the remaining harvested candidate memories** in `docs/candidate-memories/` (tracked, NOT loaded
+   by the plugin). Six remain — the human is sifting, deciding which to promote:
+   - **2 confirmed** (surfaced by the harvest AND independently written as the human's own stored memories
+     on a second machine): `memory-portability-audience`, `backup-claude-state-for-machine-switching`.
+   - **4 drafts:** `user-owns-outward-actions`, `authorize-destructive-actions-per-occasion`,
+     `config-secrets-via-gitignored-env`, `idempotent-operations-true-no-op`.
+   Promote = move into `plugins/toolkit/memories/` + add to `MEMORY.md`, then confirm **no live memory
+   links a candidate** (`grep -r "\[\[" plugins/toolkit/memories`). The fold record is `reinforced-themes.md`.
+2. **Add assets as they arise:** more skills / **output styles** / `memories/` fact-files (keep `MEMORY.md`
+   index in sync — now **30**). **Version bumps only when you ask.**
+3. **Web run-twice (optional):** unchanged — the Web Setup Script must be run twice per repo (first run
+   fails, second succeeds); mechanism unexplained, in-script retry already ruled out. Only probe if it
+   becomes annoying — see Landmines + the `cloud-git-proxy-blocks-other-owner-repos` memory.
 
 ## On-ramp / source of truth
 
@@ -100,7 +98,7 @@ re-run); it is NOT "best-effort externals."
 - **Develop on branches** (changed 2026-06-27, supersedes the old "work on `main`"): feature branch
   → `dev` integration branch → `main`. You create and work the feature branch; **do NOT merge/PR,
   push, or bump versions unless asked.** A version bump marks a *significant* change (a feature, or a
-  batch of related work) — not every commit. `main` and `dev` are currently in sync at the v0.3.3 bump.
+  batch of related work) — not every commit. `main` and `dev` are currently in sync at the v0.4.0 bump.
 
 ## Human's working style
 
@@ -140,6 +138,14 @@ re-run); it is NOT "best-effort externals."
 
 ## History (skip unless relevant — it's in git/spec)
 
+- **Cross-project memory harvest → promotions + reinforcement folds (2026-06-28, v0.4.0):** mined ~15
+  past sessions across 8 projects + the human's own stored memories on a second machine into a local
+  harvest worksheet (kept OUT of the repo at `~/Public/claude-harvests/`). Promoted 6 net-new memories
+  (`do-exactly-whats-asked`, `branch-hygiene`, `paste-ready-deliverables`, `durable-handoff-artifacts`,
+  `push-so-user-can-review-on-remote`, `offer-to-file-followups-as-issues`; index 24→30), folded reinforced
+  themes into 6 existing memories + the output style (gerund openers), and left 6 candidates under
+  `docs/candidate-memories/` for sifting. Ask-inline resolved as **Web-conditional** (no AskUserQuestion
+  picker on Web — accessibility; CLI Q&A fine). No live memory links a candidate.
 - **Instruction-blocks expansion + cross-Mac memory harvest (2026-06-27, v0.3.3):** added 5
   instruction-blocks (`git-commit-identity`, `evidence-before-claims`, `branch-workflow`,
   `pristine-commits`, `commit-and-version-restraint`) each with a concrete `@import` line using a
