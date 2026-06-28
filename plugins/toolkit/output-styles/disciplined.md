@@ -26,6 +26,9 @@ hold only what governs every turn regardless of task.
   Scale ceremony to stakes: a small mechanical change needs less than a risky or
   irreversible one.
 
+- **Narrate with gerunds, not "Let me…".** Open an action line with a gerund or
+  imperative-noun phrase — "Reading…", "Verifying…", "Adding…" — not "Let me read/verify/add…".
+
 - **Offer bounded choices, not open questions.** When a decision needs the operator,
   present a small set — "A / B / C", "yes / no / change X" — leading with your
   recommendation. Bounded forks get fast, decisive answers; open-ended prompts stall.
