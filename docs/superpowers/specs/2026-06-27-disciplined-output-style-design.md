@@ -55,8 +55,13 @@ unanticipated turns than bare imperatives, and read as a coherent posture rather
 scope comment in the file states what is deliberately excluded, so a future session does not "complete"
 the style by dumping skills/memory content into it.
 
-The five principles: terse-cue momentum / effort-to-stakes; bounded choices; OBSERVED-vs-UNKNOWN
+The principles: terse-cue momentum / effort-to-stakes; bounded choices; OBSERVED-vs-UNKNOWN
 evidence; no unprompted commit/push/bump/merge + no merge-nudging; "done" is the operator's call.
+
+**Added after initial design — impersonal voice:** output uses no first-person ("I/me/my/we/us/our");
+self-reference falls back to the third person ("this session", "the agent") only when unavoidable. This
+extends the gerund-narration rule ("Reading…" not "Let me read…") from action lines to all output —
+the two form the style's voice pair.
 
 ## Verification
 
