@@ -2,7 +2,7 @@
 
 **What this is:** a **public** Claude Code plugin-marketplace repo (`tenorune/didactic-robot`) that
 stores project-agnostic skills, instruction-blocks, an output style, and shared memory as one plugin
-(`toolkit`, currently **v0.4.0**), used via the Claude Code **CLI** and **Claude Code on the Web** (Web works
+(`toolkit`, currently **v0.4.1**), used via the Claude Code **CLI** and **Claude Code on the Web** (Web works
 with conditions — see below). Local path: `~/Public/didactic-robot`. (The README is intentionally
 one line; this HANDOFF is the operational source of truth.) NOTE: the repo is **public**
 (since 2026-06-26) to enable the Web path; the no-personal-identifiers rule keeps this safe.
@@ -13,14 +13,14 @@ one line; this HANDOFF is the operational source of truth.) NOTE: the repo is **
 .claude-plugin/marketplace.json      # marketplace manifest (lists the `toolkit` plugin)
 .githooks/pre-commit                 # identifier/secret guard (enable: git config core.hooksPath .githooks)
 plugins/toolkit/
-  .claude-plugin/plugin.json         # v0.4.0
+  .claude-plugin/plugin.json         # v0.4.1
   skills/handing-off-a-session/      # canonical handoff skill; reconcile-git-state step added v0.3.2
   skills/shared-memory/              # reads memories on demand via ${CLAUDE_PLUGIN_ROOT}/memories/
   skills/toolkit-smoke-test/         # install-verification skill
   skills/vetting-ui-changes/         # web-UI vetting discipline skill (added v0.2.0)
   output-styles/disciplined.md       # always-on working posture; opt-in via /config → Output style (added v0.3.1)
   memories/                          # in-plugin shared-memory store: MEMORY.md index + 30 fact-files
-instruction-blocks/                  # paste/@import CLAUDE.md snippets — 6 blocks + README (placeholder @import + import-all)
+instruction-blocks/                  # paste/@import CLAUDE.md snippets — 8 blocks + README (placeholder @import + import-all)
 setup/setup-script.sh                # LOCAL CLI installer (toolkit core + curated externals)
 docs/superpowers/specs/              # design specs — source of truth
 docs/superpowers/plans/              # implementation plans
@@ -30,13 +30,13 @@ docs/HANDOFF.md                      # this handoff
 
 ## What's next
 
-**Nothing is in flight.** `main` and `dev` in sync at **v0.4.0** and **pushed** (`origin/main` =
+**Nothing is in flight.** `main` and `dev` in sync at **v0.4.1** and **pushed** (`origin/main` =
 `origin/dev`; `git log --oneline -1` for the exact tip), working tree clean, no open branches. This
 section is forward-only — shipped work lives in git (the harvest worksheet is local-only, see History).
 
 Next steps when you return (all optional/incremental):
-0. **Update the active install to v0.4.0:** source is pushed at v0.4.0, but a running session pins the
-   plugin-cache snapshot it started with (this session ran the **0.3.2** cache). To move up:
+0. **Update the active install to v0.4.1:** source is pushed at v0.4.1, but a running session pins the
+   plugin-cache snapshot it started with. To move up:
    `claude plugin update toolkit@didactic-robot` + **restart**.
 1. **Sift the remaining harvested candidate memories** in `docs/candidate-memories/` (tracked, NOT loaded
    by the plugin). Six remain — the human is sifting, deciding which to promote:
@@ -98,7 +98,7 @@ re-run); it is NOT "best-effort externals."
 - **Develop on branches** (changed 2026-06-27, supersedes the old "work on `main`"): feature branch
   → `dev` integration branch → `main`. You create and work the feature branch; **do NOT merge/PR,
   push, or bump versions unless asked.** A version bump marks a *significant* change (a feature, or a
-  batch of related work) — not every commit. `main` and `dev` are currently in sync at the v0.4.0 bump.
+  batch of related work) — not every commit. `main` and `dev` are currently in sync at the v0.4.1 bump.
 
 ## Human's working style
 
@@ -138,6 +138,16 @@ re-run); it is NOT "best-effort externals."
 
 ## History (skip unless relevant — it's in git/spec)
 
+- **Instruction-blocks from harvested memories + impersonal-voice directive (2026-07-01, v0.4.1):**
+  promoted 3 of the v0.4.0 harvested memories into the blocks library — new `scope-discipline.md`
+  (`do-exactly-whats-asked` + `offer-to-file-followups-as-issues`) and `session-handoff.md`
+  (`durable-handoff-artifacts` + `paste-ready-deliverables`), plus a **Branch hygiene** section folded
+  into `branch-workflow.md` (`branch-hygiene`); blocks 6→8. Added a **No first-person voice** posture
+  bullet to the `disciplined` style (impersonal output, third-person self-reference only when
+  unavoidable; companion to the gerund rule) and recorded it in the style's design spec. Patch bump
+  0.4.0→0.4.1 (additive, non-breaking). Of the 6 harvested memories, `push-so-user-can-review-on-remote`
+  was judged Web/environment-specific and left as memory-only (no block); the remaining 6
+  `docs/candidate-memories/` are untouched.
 - **Cross-project memory harvest → promotions + reinforcement folds (2026-06-28, v0.4.0):** mined ~15
   past sessions across 8 projects + the human's own stored memories on a second machine into a local
   harvest worksheet (kept OUT of the repo at `~/Public/claude-harvests/`). Promoted 6 net-new memories
